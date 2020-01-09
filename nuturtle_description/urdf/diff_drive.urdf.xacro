@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="https://www.ros.org/wiki/xacro" name="diff_drive">
+
+<!-- include xacro macros -->
+<xacro:include filename="$(find nuturtle_description)/urdf/diff_drive_macro.xacro" />
+
+<!-- import properties from yaml config file -->
+<xacro:property name="dimension" value= "${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}"/>
+<!-- name dimension['wheel_radius'] to radius for simplicity -->
+<xacro:property name="radius" value="${dimension['wheel_radius']}" />
+
+<!-- prism link -->
+<link name="prism">
+    <inertial>
+        <mass value="6"/>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <inertia ixx="${6*(dimension['wheel_base']**2+dimension['chassis_thickness']**2)/12}" ixy="0" ixz="0" 
+            iyy="${6*(dimension['chassis_length']**2+dimension['chassis_thickness']**2)/12}" iyz="0" izz="${6*(dimension['chassis_length']**2+dimension['wheel_base']**2)/12}"/>
+    </inertial>
+
+    <collision name="prism_collision">
+        <geometry>
+            <box size="${dimension['chassis_length']} ${dimension['wheel_base']} ${dimension['chassis_thickness']}"/>
+        </geometry>
+    </collision>
+
+    <visual name="prism_visual">
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+            <box size="${dimension['chassis_length']} ${dimension['wheel_base']} ${dimension['chassis_thickness']}"/>
+        </geometry>
+        <material name="green">
+                <color rgba="0 1 0 1" />
+        </material>
+    </visual>
+</link>
+
+
+<!-- caster 1 joint and link -->
+<joint name="prism_caster1" type="fixed">
+    <origin xyz="-0.2 0 ${-(dimension['chassis_thickness']/2+0.025)}" rpy="0 0 0" />
+    <parent link="prism" />
+    <child link="caster1" />
+</joint>
+
+<xacro:link_caster name="caster1" />
+
+
+
+<!-- caster 2 joint and link -->
+<joint name="prism_caster2" type="fixed">
+    <origin xyz="-0.2 0 ${dimension['chassis_thickness']/2+0.025}" rpy="0 0 0" />
+    <parent link="prism" />
+    <child link="caster2" />
+</joint>
+
+<xacro:link_caster name="caster2" />
+
+
+
+<!-- left wheel joint and link -->
+<joint name="prism_right_wheel" type="continuous">
+    <origin rpy="${pi/2} 0 0" xyz="0.1 ${-(dimension['wheel_base']/2+0.02)} 0"/>
+    <parent link="prism"/>
+    <child link="right_wheel" />
+    <axis rpy="0 0 0" xyz="0 0 -1"/>
+</joint>  
+
+<xacro:link_wheel name="right_wheel" />
+
+
+
+
+<!-- right wheel joint and link -->
+<joint name="prism_left_wheel" type="continuous">
+    <origin rpy="${-pi/2} 0 0" xyz="0.1 ${dimension['wheel_base']/2+0.02} 0"/>
+    <parent link="prism"/>
+    <child link="left_wheel" />
+    <axis rpy="0 0 0" xyz="0 0 1"/>
+</joint>  
+
+<xacro:link_wheel name="left_wheel" />
+
+
+</robot>

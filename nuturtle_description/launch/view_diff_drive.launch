@@ -1,0 +1,23 @@
+<!-- The launch file is used to view the diff_drive robot in Rivz -->
+
+<launch>
+
+    <!-- Launch the joint_state_publisher gui to publish joint angles -->
+    <arg name="use_jsp_gui" default='true' doc="Launch the joint_state_publisher gui to publish joint angles"/>
+
+    <param name="robot_description" command="xacro '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'" />
+
+    <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <group if="$(eval arg('use_jsp_gui') == true)">
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <param name="use_gui" value="true" />
+        </node>
+    </group>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_robot.rviz" required="true"/>
+
+
+</launch>
