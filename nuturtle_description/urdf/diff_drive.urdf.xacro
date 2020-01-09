@@ -9,38 +9,45 @@
 <xacro:property name="dimension" value= "${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}"/>
 <!-- name dimension['wheel_radius'] to radius for simplicity -->
 <xacro:property name="radius" value="${dimension['wheel_radius']}" />
+<!-- The actual width of the base -->
+<xacro:property name="base_width" value="${dimension['wheel_base'] - dimension['wheel_width']}" />
+<!-- Define caster 'radius' - the length of the cylinder -->
+<xacro:property name="caster_radius" value="${radius - dimension['chassis_thickness']/2}" />
 
-<!-- prism link -->
-<link name="prism">
+<!-- base_link -->
+<link name="base_link">
     <inertial>
-        <mass value="6"/>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <inertia ixx="${6*(dimension['wheel_base']**2+dimension['chassis_thickness']**2)/12}" ixy="0" ixz="0" 
-            iyy="${6*(dimension['chassis_length']**2+dimension['chassis_thickness']**2)/12}" iyz="0" izz="${6*(dimension['chassis_length']**2+dimension['wheel_base']**2)/12}"/>
+        <mass value="1"/>
+        <origin rpy="0 0 0" xyz="${(dimension['chassis_length']/2 - radius)} 0 0"/>
+        <inertia ixx="${1*(base_width**2+dimension['chassis_thickness']**2)/12}" ixy="0" ixz="0" 
+            iyy="${1*(dimension['chassis_length']**2+dimension['chassis_thickness']**2)/12}" iyz="0" izz="${1*(dimension['chassis_length']**2+base_width**2)/12}"/>
     </inertial>
 
-    <collision name="prism_collision">
+    <collision name="base_link_collision">
+        <origin rpy="0 0 0" xyz="${(dimension['chassis_length']/2 - radius)} 0 0" />
         <geometry>
-            <box size="${dimension['chassis_length']} ${dimension['wheel_base']} ${dimension['chassis_thickness']}"/>
+            <box size="${dimension['chassis_length']} ${base_width} ${dimension['chassis_thickness']}"/>
         </geometry>
     </collision>
 
-    <visual name="prism_visual">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+    <visual name="base_link_visual">
+        <!-- Learned: orgin here is displaced from the orgin of the last joint frame -->
+        <origin rpy="0 0 0" xyz="${(dimension['chassis_length']/2 - radius)} 0 0"/>
         <geometry>
-            <box size="${dimension['chassis_length']} ${dimension['wheel_base']} ${dimension['chassis_thickness']}"/>
+            <box size="${dimension['chassis_length']} ${base_width} ${dimension['chassis_thickness']}"/>
         </geometry>
-        <material name="green">
-                <color rgba="0 1 0 1" />
+        <material name="blue">
+                <color rgba="0 0 1 1" />
         </material>
     </visual>
 </link>
 
 
 <!-- caster 1 joint and link -->
-<joint name="prism_caster1" type="fixed">
-    <origin xyz="-0.2 0 ${-(dimension['chassis_thickness']/2+0.025)}" rpy="0 0 0" />
-    <parent link="prism" />
+<joint name="base_link_caster1" type="fixed">
+    <!-- Learned: it is displaced from the last joint frame -->
+    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${-(dimension['chassis_thickness']/2+caster_radius/2)}" rpy="0 0 0" />
+    <parent link="base_link" />
     <child link="caster1" />
 </joint>
 
@@ -49,9 +56,9 @@
 
 
 <!-- caster 2 joint and link -->
-<joint name="prism_caster2" type="fixed">
-    <origin xyz="-0.2 0 ${dimension['chassis_thickness']/2+0.025}" rpy="0 0 0" />
-    <parent link="prism" />
+<joint name="base_link_caster2" type="fixed">
+    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${dimension['chassis_thickness']/2+caster_radius/2}" rpy="0 0 0" />
+    <parent link="base_link" />
     <child link="caster2" />
 </joint>
 
@@ -60,11 +67,11 @@
 
 
 <!-- left wheel joint and link -->
-<joint name="prism_right_wheel" type="continuous">
-    <origin rpy="${pi/2} 0 0" xyz="0.1 ${-(dimension['wheel_base']/2+0.02)} 0"/>
-    <parent link="prism"/>
+<joint name="right_wheel_axle" type="continuous">
+    <origin rpy="0 0 0" xyz="0 ${-(dimension['wheel_base']/2)} 0"/>
+    <parent link="base_link"/>
     <child link="right_wheel" />
-    <axis rpy="0 0 0" xyz="0 0 -1"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
 </joint>  
 
 <xacro:link_wheel name="right_wheel" />
@@ -73,11 +80,11 @@
 
 
 <!-- right wheel joint and link -->
-<joint name="prism_left_wheel" type="continuous">
-    <origin rpy="${-pi/2} 0 0" xyz="0.1 ${dimension['wheel_base']/2+0.02} 0"/>
-    <parent link="prism"/>
+<joint name="left_wheel_axle" type="continuous">
+    <origin rpy="0 0 0" xyz="0 ${dimension['wheel_base']/2} 0"/>
+    <parent link="base_link"/>
     <child link="left_wheel" />
-    <axis rpy="0 0 0" xyz="0 0 1"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
 </joint>  
 
 <xacro:link_wheel name="left_wheel" />

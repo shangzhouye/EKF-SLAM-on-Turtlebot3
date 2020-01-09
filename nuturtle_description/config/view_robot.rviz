@@ -65,6 +65,11 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         caster1:
           Alpha: 1
           Show Axes: false
@@ -76,11 +81,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         left_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prism:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -101,13 +101,13 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base_link:
+          Value: true
         caster1:
           Value: false
         caster2:
           Value: false
         left_wheel:
-          Value: true
-        prism:
           Value: true
         right_wheel:
           Value: false
@@ -117,7 +117,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        prism:
+        base_link:
           caster1:
             {}
           caster2:
@@ -132,7 +132,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: prism
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -193,4 +193,4 @@ Window Geometry:
     collapsed: false
   Width: 1200
   X: 563
-  Y: 1184
+  Y: 204
