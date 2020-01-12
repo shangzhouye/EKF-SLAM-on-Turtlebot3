@@ -1,0 +1,8 @@
+<launch>
+
+    <rosparam command="load" file="$(find tsim)/config/trect.yaml" />
+
+    <node name="turtle_rect" pkg="tsim" type="turtle_rect" output="screen" />
+    <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+
+</launch>
