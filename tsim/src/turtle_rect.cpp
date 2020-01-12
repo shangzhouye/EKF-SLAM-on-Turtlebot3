@@ -138,12 +138,16 @@ int main(int argc, char **argv)
     stop_msg.linear.x = 0;
     stop_msg.angular.z = 0;
 
+    // create a service to reset the turtle
+    
+
     while (ros::ok())
     {
         // first level of the state machine: reset the turtle or not?
         nh.getParam("/if_reset", if_reset);
         switch (if_reset)
         {
+        // reset the turtle
         case 1:
             vel_control.publish(stop_msg);
             initialize_turtle(&nh, x, y);
@@ -153,6 +157,7 @@ int main(int argc, char **argv)
             current_state = SW;
             break;
 
+        // move the turtle
         case 0:
             switch (current_state)
             {
