@@ -1,14 +1,21 @@
 /// \file turtle_rect.cpp
-/// \brief make the turtle move in a rectangular trajectory
+/// \brief Make the turtle move in a rectangular trajectory.
 ///
 /// PARAMETERS:
-///     parameter_name (parameter_type): description of the parameter
+///     x (double): The x coordinate of the lower left corner of a rectangle
+///     y (double): The y coordinate of the lower left corner of a rectangle
+///     width (double): The width of the rectangle
+///     height (double): The height of the rectangle
+///     trans_vel (double): The translational velocity of the robot
+///     rot_vel (double): The rotational velocity of the robot
+///     frequency (int): The frequency of the control loop
 /// PUBLISHES:
-///     topic_name (topic_type): description of topic
+///     pose_error (tsim::PoseError): Publish the error of feedforward control
+///     turtle1/cmd_vel (geometry_msgs::Twist): Publish the control commands to move the turtle
 /// SUBSCRIBES:
-///     topic_name (topic_type): description of the topic
+///     turtle1/pose (turtlesim::Pose): The current actual pose (x, y, heading) of the turtle
 /// SERVICES:
-///     service_name (service_type): description of the service
+///     traj_reset (std_srvs::Empty): Reset the trajectory
 
 #include <cmath>
 #include "ros/ros.h"
@@ -28,29 +35,36 @@ double actual_theta;
 int if_reset;
 double target_x, target_y, target_theta;
 
-// four states defined
-// 1. SW: go straight (width)
-// 2. RW: rotate after go straight (width)
-// 3. SH: go straight (height)
-// 4. RH: rotate after go straight (height)
-
+/// \brief four states defined
 enum CurrentState
 {
+    /// SW: go straight (width)
     SW,
+    /// RW: rotate after go straight (width)
     RW,
+    /// SH: go straight (height)
     SH,
+    /// RH: rotate after go straight (height)
     RH
 };
 
-// warp the angle between -pi and pi
-double angle_wrapping(double x){
-    x = std::fmod(x + PI,PI*2);
+/// \brief Warp the angle between -pi and pi
+///
+/// \param x - The angle to be wrapped
+/// \returns Wrapped angle
+double angle_wrapping(double x)
+{
+    x = std::fmod(x + PI, PI * 2);
     if (x < 0)
-        x += PI*2;
+        x += PI * 2;
     return x - PI;
 }
 
-// control the turtle to go straight
+/// \brief Control the turtle to go straight
+///
+/// \param length - The length of this leg
+/// \param velocity - Moving velocity
+/// \param frequency - Publishing frequency
 int go_straight(double length, double velocity, double frequency, ros::Publisher *pub, ros::Publisher *error_pub)
 {
     int times = (int)(length / velocity * frequency);
@@ -63,15 +77,15 @@ int go_straight(double length, double velocity, double frequency, ros::Publisher
         control_msg.linear.x = velocity;
         control_msg.angular.z = 0;
         pub->publish(control_msg);
-        target_x = target_x + (1.0/frequency)*velocity*std::cos(target_theta);
+        target_x = target_x + (1.0 / frequency) * velocity * std::cos(target_theta);
         // ROS_INFO("target_x is %f", target_x);
         // ROS_INFO("actual_x is %f", actual_x);
         // ROS_INFO("error_x is %f", actual_x - target_x);
-        target_y = target_y + (1.0/frequency)*velocity*std::sin(target_theta);
+        target_y = target_y + (1.0 / frequency) * velocity * std::sin(target_theta);
         tsim::PoseError error_msg;
         error_msg.x_error = actual_x - target_x;
         error_msg.y_error = actual_y - target_y;
-        error_msg.theta_error = actual_theta - target_theta;
+        error_msg.theta_error = angle_wrapping(actual_theta - target_theta);
         error_pub->publish(error_msg);
         rate.sleep();
     }
@@ -79,7 +93,11 @@ int go_straight(double length, double velocity, double frequency, ros::Publisher
     return 0;
 }
 
-// control the turtle to rotate
+/// \brief Control the turtle to rotate
+///
+/// \param degrees - The degrees to rotate
+/// \param velocity - Rotating velocity
+/// \param frequency - Publishing frequency
 int rotate(double degrees, double velocity, double frequency, ros::Publisher *pub, ros::Publisher *error_pub)
 {
     int times = (int)(degrees / velocity * frequency);
@@ -92,11 +110,11 @@ int rotate(double degrees, double velocity, double frequency, ros::Publisher *pu
         control_msg.linear.x = 0;
         control_msg.angular.z = velocity;
         pub->publish(control_msg);
-        target_theta = angle_wrapping(target_theta + (1.0/frequency)*velocity);
+        target_theta = angle_wrapping(target_theta + (1.0 / frequency) * velocity);
         tsim::PoseError error_msg;
         error_msg.x_error = actual_x - target_x;
         error_msg.y_error = actual_y - target_y;
-        error_msg.theta_error = actual_theta - target_theta;
+        error_msg.theta_error = angle_wrapping(actual_theta - target_theta);
         error_pub->publish(error_msg);
         rate.sleep();
     }
@@ -104,7 +122,11 @@ int rotate(double degrees, double velocity, double frequency, ros::Publisher *pu
     return 0;
 }
 
-// initialize the turle to the starting position
+/// \brief Initialize the turle to the starting position
+///
+/// \param nh - Node handle object
+/// \param x - Initial x position
+/// \param y - Initial y position
 int initialize_turtle(ros::NodeHandle *nh, double x, double y)
 {
     // lift the pen
@@ -157,15 +179,15 @@ int initialize_turtle(ros::NodeHandle *nh, double x, double y)
     return 0;
 }
 
-// traj_reset service handle function
+/// \brief traj_reset service handle function
 bool handle_traj_reset(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
     if_reset = 1;
     return true;
 }
 
-// the callback function to save the actual pose
-void callback_save_pose(const turtlesim::Pose& msg)
+/// \brief the callback function to save the actual pose
+void callback_save_pose(const turtlesim::Pose &msg)
 {
     actual_x = msg.x;
     actual_y = msg.y;
