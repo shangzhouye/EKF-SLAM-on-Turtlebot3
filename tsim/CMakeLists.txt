@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   turtlesim
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions

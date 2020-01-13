@@ -2,6 +2,7 @@
 #include "turtlesim/SetPen.h"
 #include "turtlesim/TeleportAbsolute.h"
 #include "geometry_msgs/Twist.h"
+#include "std_srvs/Empty.h"
 #define PI 3.14159265358979323846 /* pi */
 
 // four states defined
@@ -103,11 +104,24 @@ int initialize_turtle(ros::NodeHandle *nh, double x, double y)
     return 0;
 }
 
+// traj_reset service handle function
+bool handle_traj_reset(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+{
+    ROS_INFO("Inside the service");
+    ros::NodeHandle nh_temp;
+    ROS_INFO("Create nh_temp successful");
+    nh_temp.setParam("/if_reset", 1);
+    return true;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "turtle_rect");
     ros::NodeHandle nh;
     ROS_INFO("Node has been started.");
+
+    // create a service to reset the turtle
+    ros::ServiceServer traj_reset_server = nh.advertiseService("/traj_reset", handle_traj_reset);
 
     // read parameters from the parameter server
     double x, y, width, height, trans_vel, rot_vel;
@@ -137,9 +151,6 @@ int main(int argc, char **argv)
     geometry_msgs::Twist stop_msg;
     stop_msg.linear.x = 0;
     stop_msg.angular.z = 0;
-
-    // create a service to reset the turtle
-    
 
     while (ros::ok())
     {
@@ -186,13 +197,14 @@ int main(int argc, char **argv)
                 break;
             }
             break;
-        
+
         default:
             ROS_INFO("Unexpected state.");
             break;
         }
+        // Learned: ros::spinOnce() will call all the callbacks waiting to be called at that point in time.
+        ros::spinOnce();
     }
 
-    ros::spin();
     return 0;
 }
