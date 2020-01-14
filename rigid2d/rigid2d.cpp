@@ -123,6 +123,15 @@ Vector2D Transform2D::operator()(Vector2D v) const
     return result;
 }
 
+Twist2D Transform2D::operator()(Twist2D t) const
+{
+    Twist2D result;
+    result.omega = t.omega;
+    result.v_x = this->trans_.y * t.omega + std::cos(this->radians_) * t.v_x - std::sin(this->radians_) * t.v_y;
+    result.v_y = -this->trans_.x * t.omega + std::sin(this->radians_) * t.v_x + std::cos(this->radians_) * t.v_y;
+    return result;
+}
+
 Transform2D Transform2D::inv() const
 {
     double inv_radians = -this->radians_;

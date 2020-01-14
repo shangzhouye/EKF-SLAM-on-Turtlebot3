@@ -23,10 +23,10 @@ int main()
     */
 
     // input two transforms
-    std::cout << "Enter transform Tab:" << std::endl;
+    std::cout << "Enter transform Tab [x y theta]:" << std::endl;
     rigid2d::Transform2D T_ab, T_bc, T_ba, T_cb, T_ac, T_ca;
     std::cin >> T_ab;
-    std::cout << "Enter transform Tbc:" << std::endl;
+    std::cout << "Enter transform Tbc [x y theta]:" << std::endl;
     std::cin >> T_bc;
 
     std::cout << "Tab:" << std::endl;
@@ -52,37 +52,52 @@ int main()
     std::cout << T_ca;
 
     rigid2d::Vector2D vect;
-    std::cout << "Enter a vector:" << std::endl;
+    std::cout << "Enter a vector [x y]:" << std::endl;
     std::cin >> vect;
     std::cout << "Which frame it is defined in:" << std::endl;
     char frame_id;
     std::cin >> frame_id;
+    std::cout << "Enter a twist (in the same frame) [omega v_x v_y]:" << std::endl;
+    rigid2d::Twist2D twi;
+    std::cin >> twi;
     if (frame_id == 97)
-    {
+    {   
+        std::cout << "(First line is vector, second line is twist)" << std::endl;
         std::cout << "In frame a:" << std::endl;
         std::cout << vect;
+        std::cout << twi;
         std::cout << "In frame b:" << std::endl;
         std::cout << T_ba(vect);
+        std::cout << T_ba(twi);
         std::cout << "In frame c:" << std::endl;
         std::cout << T_ca(vect);
+        std::cout << T_ca(twi);
     }
     else if (frame_id == 98)
     {
+        std::cout << "(First line is vector, second line is twist)" << std::endl;
         std::cout << "In frame a:" << std::endl;
         std::cout << T_ab(vect);
+        std::cout << T_ab(twi);
         std::cout << "In frame b:" << std::endl;
         std::cout << vect;
+        std::cout << twi;
         std::cout << "In frame c:" << std::endl;
         std::cout << T_cb(vect);
+        std::cout << T_cb(twi);
     }
     else if (frame_id == 99)
     {
+        std::cout << "(First line is vector, second line is twist)" << std::endl;
         std::cout << "In frame a:" << std::endl;
         std::cout << T_ac(vect);
+        std::cout << T_ac(twi);
         std::cout << "In frame b:" << std::endl;
         std::cout << T_bc(vect);
+        std::cout << T_bc(twi);
         std::cout << "In frame c:" << std::endl;
         std::cout << vect;
+        std::cout << twi;
     }
     else
     {
