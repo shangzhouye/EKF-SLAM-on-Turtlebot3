@@ -15,9 +15,16 @@ std::ostream &operator<<(std::ostream &os, const Vector2D &v)
     return os;
 }
 
+// in the form of [x, y, radians]
 std::ostream &operator<<(std::ostream &os, const Transform2D &tf)
 {
     os << "[" << tf.trans_.x << " " << tf.trans_.y << " " << tf.radians_ << "]" << std::endl;
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const Twist2D &t)
+{
+    os << "[" << t.omega << " " << t.v_x << " " << t.v_y << "]" << std::endl;
     return os;
 }
 
@@ -39,6 +46,7 @@ std::istream &operator>>(std::istream &is, Vector2D &v)
     return is;
 }
 
+// in the form of [x, y, radians]
 std::istream &operator>>(std::istream &is, Transform2D &tf)
 {
     std::string string_x, string_y, string_theta;
@@ -55,6 +63,26 @@ std::istream &operator>>(std::istream &is, Transform2D &tf)
     ss_y >> tf.trans_.y;
     std::stringstream ss_theta(string_theta);
     ss_theta >> tf.radians_;
+
+    return is;
+}
+
+std::istream &operator>>(std::istream &is, Twist2D &t)
+{
+    std::string string_omega, string_v_x, string_v_y;
+    is >> string_omega >> string_v_x >> string_v_y;
+
+    // erase or pop the "[" character
+    string_omega.erase(string_omega.begin());
+    string_v_y.pop_back();
+
+    // convert string to double
+    std::stringstream ss_omega(string_omega);
+    ss_omega >> t.omega;
+    std::stringstream ss_v_x(string_v_x);
+    ss_v_x >> t.v_x;
+    std::stringstream ss_v_y(string_v_y);
+    ss_v_y >> t.v_y;
 
     return is;
 }
@@ -115,7 +143,7 @@ Transform2D &Transform2D::operator*=(const Transform2D &rhs)
 
 Transform2D operator*(Transform2D lhs, const Transform2D &rhs)
 {
-    lhs*=rhs;
+    lhs *= rhs;
     return lhs;
 }
 

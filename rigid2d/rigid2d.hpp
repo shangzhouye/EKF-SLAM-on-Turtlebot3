@@ -80,6 +80,25 @@ std::ostream &operator<<(std::ostream &os, const Vector2D &v);
 /// https://en.cppreference.com/w/cpp/io/basic_istream/get
 std::istream &operator>>(std::istream &is, Vector2D &v);
 
+/// \brief A 2-Dimensional Twist
+struct Twist2D
+{
+    double omega = 0.0;
+    double v_x = 0.0;
+    double v_y = 0.0;
+};
+
+/// \brief output a 2 dimensional twist as [omega v_x v_y]
+/// os - stream to output to
+/// t - the twist to print
+std::ostream &operator<<(std::ostream &os, const Twist2D &t);
+
+/// \brief input a 2 dimensional twist
+/// entered as [omega v_x v_y]
+/// is - stream from which to read
+/// t [out] - output twist
+std::istream &operator>>(std::istream &is, Twist2D &t);
+
 /// \brief a rigid body transformation in 2 dimensions
 class Transform2D
 {
@@ -125,7 +144,6 @@ public:
     friend std::istream &operator>>(std::istream &is, Transform2D &tf);
 
 private:
-
     Vector2D trans_;
     double radians_;
 };
