@@ -119,6 +119,15 @@ public:
     /// \brief \see operator<<(...) (declared outside this class)
     /// for a description
     friend std::ostream &operator<<(std::ostream &os, const Transform2D &tf);
+
+    /// \brief \see operator>>(...) (declared outside this class)
+    /// for a description
+    friend std::istream &operator>>(std::istream &is, Transform2D &tf);
+
+private:
+
+    Vector2D trans_;
+    double radians_;
 };
 
 /// \brief should print a human readable version of the transform:
