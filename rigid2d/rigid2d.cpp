@@ -15,10 +15,11 @@ std::ostream &operator<<(std::ostream &os, const Vector2D &v)
     return os;
 }
 
-// in the form of [x, y, radians]
 std::ostream &operator<<(std::ostream &os, const Transform2D &tf)
 {
-    os << "[" << tf.trans_.x << " " << tf.trans_.y << " " << tf.radians_ << "]" << std::endl;
+    os << "degrees:" << rad2deg(tf.radians_) << " "
+       << "dx:" << tf.trans_.x << " "
+       << "dy:" << tf.trans_.y << " " << std::endl;
     return os;
 }
 
@@ -33,9 +34,12 @@ std::istream &operator>>(std::istream &is, Vector2D &v)
     std::string string_x, string_y;
     is >> string_x >> string_y;
 
-    // erase or pop the "[" character
-    string_x.erase(string_x.begin());
-    string_y.pop_back();
+    // if in the [x, y] format, erase or pop the "[" character
+    if (string_x.substr(0, 1) == "[")
+    {
+        string_x.erase(string_x.begin());
+        string_y.pop_back();
+    }
 
     // convert string to double
     std::stringstream ss_x(string_x);
@@ -43,26 +47,34 @@ std::istream &operator>>(std::istream &is, Vector2D &v)
     std::stringstream ss_y(string_y);
     ss_y >> v.y;
 
+    std::cout << v.x << " " << v.y << std::endl;
+
     return is;
 }
 
-// in the form of [x, y, radians]
 std::istream &operator>>(std::istream &is, Transform2D &tf)
 {
-    std::string string_x, string_y, string_theta;
-    is >> string_x >> string_y >> string_theta;
+    std::string string_theta, string_x, string_y;
+    is >> string_theta >> string_x >> string_y;
 
-    // erase or pop the "[" character
-    string_x.erase(string_x.begin());
-    string_theta.pop_back();
+    // check which format is the input
+    if (string_theta.substr(0, 1) == "d")
+    {
+        string_theta.erase(0, 8);
+        string_x.erase(0, 3);
+        string_y.erase(0, 3);
+    }
 
     // convert string to double
+    std::stringstream ss_theta(string_theta);
+    // convert degrees to radians
+    double degrees_temp;
+    ss_theta >> degrees_temp;
+    tf.radians_ = deg2rad(degrees_temp);
     std::stringstream ss_x(string_x);
     ss_x >> tf.trans_.x;
     std::stringstream ss_y(string_y);
     ss_y >> tf.trans_.y;
-    std::stringstream ss_theta(string_theta);
-    ss_theta >> tf.radians_;
 
     return is;
 }

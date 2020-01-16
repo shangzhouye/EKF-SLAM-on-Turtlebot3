@@ -3,6 +3,24 @@
 /// \file
 /// \brief Library for two-dimensional rigid body transformations.
 
+/**************************
+ * Format of input and output
+ * 
+ * Vector2D
+ * - input: entered as two numbers separated by a newline or a space, or entered as [xcomponent ycomponent]
+ * - output: [xcomponent ycomponent]
+ * 
+ * Twist2D
+ * - input: [omega v_x v_y]
+ * - output: [omega v_x v_y]
+ * 
+ * Transform2D
+ * (When contructed by constructor, rotation has to be in radians)
+ * - input: either as output by operator<< or as degrees, dx, dy separated by spaces or newlines
+ * - output: degrees:90 dx:3 dy:5
+ * 
+ **************************/
+
 #include <iosfwd> // contains forward definitions for iostream objects
 #include <cmath>
 #include <iostream>
@@ -49,12 +67,16 @@ constexpr double rad2deg(double rad)
 /// You should also purposely (and temporarily) make one of these tests fail
 /// just to see what happens
 static_assert(almost_equal(0, 0), "is_zero failed");
+static_assert(!almost_equal(0, 0.01), "is_zero failed");
 
 static_assert(almost_equal(0.001, 0.005, 1.0e-2), "is_zero failed");
+static_assert(almost_equal(0.001, 0.0015, 1.0e-3), "is_zero failed");
 
 static_assert(almost_equal(deg2rad(0.0), 0.0), "deg2rad failed");
+static_assert(almost_equal(deg2rad(30), 0.523599, 1.0e-3), "deg2rad failed");
 
 static_assert(almost_equal(rad2deg(0.0), 0.0), "rad2deg failed");
+static_assert(almost_equal(rad2deg(15), 859.437, 1.0e-3), "rad2deg failed");
 
 static_assert(almost_equal(deg2rad(rad2deg(2.1)), 2.1), "deg2rad failed");
 
