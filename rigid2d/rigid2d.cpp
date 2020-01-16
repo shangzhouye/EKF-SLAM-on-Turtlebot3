@@ -168,4 +168,14 @@ Transform2D operator*(Transform2D lhs, const Transform2D &rhs)
     return lhs;
 }
 
+Vector2D normalize_vector(Vector2D vector_input)
+{
+    Vector2D vector_output;
+    double length = std::sqrt(std::pow(vector_input.x, 2) + std::pow(vector_input.y, 2));
+    vector_output.x = vector_input.x / length;
+    vector_output.y = vector_input.y / length;
+
+    return vector_output;
+}
+
 } // namespace rigid2d

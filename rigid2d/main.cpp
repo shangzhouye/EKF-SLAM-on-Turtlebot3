@@ -5,6 +5,7 @@
 
 int main()
 {
+    
     /* Start: Testing code ******************************
     // rigid2d::Vector2D vect;
     // std::cin >> vect;
@@ -23,10 +24,10 @@ int main()
     */
 
     // input two transforms
-    std::cout << "Enter transform Tab [x y theta]:" << std::endl;
+    std::cout << "Enter transform Tab: degrees, dx, dy:" << std::endl;
     rigid2d::Transform2D T_ab, T_bc, T_ba, T_cb, T_ac, T_ca;
     std::cin >> T_ab;
-    std::cout << "Enter transform Tbc [x y theta]:" << std::endl;
+    std::cout << "Enter transform Tbc: degrees, dx, dy:" << std::endl;
     std::cin >> T_bc;
 
     std::cout << "Tab:" << std::endl;

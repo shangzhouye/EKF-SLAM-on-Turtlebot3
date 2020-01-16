@@ -21,6 +21,10 @@
 
 4. We need to be able to normalize Vector2D objects (i.e., find the unit vector in the direction of a given Vector2D).
 
+- It be either passed by copy, by reference or by pointer.
+- Pass by copy would ensure the original vector would not be modified. Pass by reference or pointer can save the memory but can possibly modified the original vector.
+- Pass by copy as the vector does not occupy much memory. (There is also the possibility to pass by constant reference.)
+
 5. Implement the normalize functionality using the method you chose.
 
 6. Why is Transform2D::inv() declared const while Transform2D::operator*=() is not?

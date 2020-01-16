@@ -102,6 +102,9 @@ std::ostream &operator<<(std::ostream &os, const Vector2D &v);
 /// https://en.cppreference.com/w/cpp/io/basic_istream/get
 std::istream &operator>>(std::istream &is, Vector2D &v);
 
+/// \brief normalize Vector2D
+Vector2D normalize_vector(Vector2D vector_input);
+
 /// \brief A 2-Dimensional Twist
 struct Twist2D
 {
