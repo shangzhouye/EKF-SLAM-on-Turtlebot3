@@ -47,8 +47,6 @@ std::istream &operator>>(std::istream &is, Vector2D &v)
     std::stringstream ss_y(string_y);
     ss_y >> v.y;
 
-    std::cout << v.x << " " << v.y << std::endl;
-
     return is;
 }
 
@@ -156,9 +154,9 @@ Transform2D Transform2D::inv() const
 
 Transform2D &Transform2D::operator*=(const Transform2D &rhs)
 {
-    this->radians_ = this->radians_ + rhs.radians_;
     this->trans_.x = rhs.trans_.x * std::cos(this->radians_) - rhs.trans_.y * std::sin(this->radians_) + this->trans_.x;
     this->trans_.y = rhs.trans_.x * std::sin(this->radians_) + rhs.trans_.y * std::cos(this->radians_) + this->trans_.y;
+    this->radians_ = this->radians_ + rhs.radians_;
     return *this;
 }
 
