@@ -1,6 +1,6 @@
 /// \file
 /// \brief Library for two-dimensional rigid body transformations.
-#include "rigid2d.hpp"
+#include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>

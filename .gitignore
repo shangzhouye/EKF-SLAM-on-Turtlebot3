@@ -2,3 +2,6 @@ rigid2d/.vscode/
 rigid2d/rigid2d
 rigid2d/rigid2d_test
 rigid2d/test_output.txt
+.vscode/
+workspace.code-workspace
+CMakeLists.txt

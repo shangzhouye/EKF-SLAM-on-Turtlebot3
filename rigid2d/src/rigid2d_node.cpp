@@ -1,9 +1,10 @@
 /// \file
 /// \brief Rigid transformations using rigid2d library.
-#include "rigid2d.hpp"
+#include "rigid2d/rigid2d.hpp"
 #include <iostream>
+#include "ros/ros.h"
 
-int main()
+int main(int argc, char **argv)
 {
     
     /* Start: Testing code ******************************
@@ -22,6 +23,10 @@ int main()
     // std::cout << in_trans;
     // End: Testing code ******************************
     */
+
+    // init the node
+    ros::init(argc, argv, "node");
+    ros::NodeHandle nh;
 
     // input two transforms
     std::cout << "Enter transform Tab: degrees, dx, dy:" << std::endl;
