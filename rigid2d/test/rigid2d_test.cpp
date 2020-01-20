@@ -20,8 +20,8 @@ TEST(Rigid2dTest, TransformationOperator)
 
     rigid2d::Vector2D result = trans_test(vect_test);
 
-    ASSERT_DOUBLE_EQ(1, result.x);
-    ASSERT_DOUBLE_EQ(-2, result.y);
+    ASSERT_DOUBLE_EQ(1.0, result.x);
+    ASSERT_DOUBLE_EQ(-2.0, result.y);
 }
 
 TEST(Rigid2dTest, InputOutput)
@@ -45,21 +45,18 @@ TEST(Rigid2dTest, InputOutput)
 TEST(Rigid2dTest, Inverse)
 {
     rigid2d::Vector2D translation;
-    translation.x = -1.11022e-16;
+    translation.x = 0;
     translation.y = -1;
     rigid2d::Transform2D trans_test(translation, rigid2d::PI * 3.0 / 2.0);
 
     rigid2d::Transform2D result = trans_test.inv();
 
-    std::ostringstream out;
-    out << result;
+    double result_x, result_y, result_theta;
+    result.displacement(result_x, result_y, result_theta);
 
-    std::string string_ = out.str();
-    const char *str1 = string_.c_str();
-
-    const char *str2 = "degrees:-270 dx:-1 dy:-7.2675e-17 \n";
-
-    ASSERT_STREQ(str1, str2);
+    ASSERT_DOUBLE_EQ(-1.0, result_x);
+    ASSERT_NEAR(0.0, result_y, 1.0e-12);
+    ASSERT_DOUBLE_EQ(-rigid2d::PI * 3.0 / 2.0, result_theta);
 }
 
 TEST(Rigid2dTest, Multiplication)
@@ -76,15 +73,12 @@ TEST(Rigid2dTest, Multiplication)
 
     rigid2d::Transform2D result = trans_test1 * trans_test2;
 
-    std::ostringstream out;
-    out << result;
+    double result_x, result_y, result_theta;
+    result.displacement(result_x, result_y, result_theta);
 
-    std::string string_ = out.str();
-    const char *str1 = string_.c_str();
-
-    const char *str2 = "degrees:270 dx:-1.11022e-16 dy:-1 \n";
-
-    ASSERT_STREQ(str1, str2);
+    ASSERT_NEAR(0.0, result_x, 1.0e-12);
+    ASSERT_DOUBLE_EQ(-1.0, result_y);
+    ASSERT_DOUBLE_EQ(rigid2d::PI * 3.0 / 2.0, result_theta);
 }
 
 // google test main function

@@ -160,6 +160,15 @@ Transform2D &Transform2D::operator*=(const Transform2D &rhs)
     return *this;
 }
 
+int Transform2D::displacement(double &x, double &y, double &theta)
+{
+    x = this->trans_.x;
+    y = this->trans_.y;
+    theta = this->radians_;
+
+    return 0;
+}
+
 Transform2D operator*(Transform2D lhs, const Transform2D &rhs)
 {
     lhs *= rhs;

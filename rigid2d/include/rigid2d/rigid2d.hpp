@@ -165,6 +165,11 @@ public:
     /// \returns a reference to the newly transformed operator
     Transform2D &operator*=(const Transform2D &rhs);
 
+    /// \brief returns the x, y, and theta values from the transform
+    /// \param &x, &y, &theta - reference for return multiple values
+    /// \returns the x, y, and theta values from the transform
+    int displacement(double &x, double &y, double &theta);
+
     /// \brief \see operator<<(...) (declared outside this class)
     /// for a description
     friend std::ostream &operator<<(std::ostream &os, const Transform2D &tf);
