@@ -83,9 +83,32 @@ static_assert(almost_equal(deg2rad(rad2deg(2.1)), 2.1), "deg2rad failed");
 /// \brief A 2-Dimensional Vector
 struct Vector2D
 {
+public:
     double x = 0.0;
     double y = 0.0;
+
+    /// \brief vector addition in place
+    /// \param v - the vector to be added
+    /// \return the added vector
+    Vector2D &operator+=(const Vector2D &rhs);
+
+    /// \brief vector subtraction in place
+    /// \param v - the vector to be subtracted
+    /// \return the subtracted vector
+    Vector2D &operator-=(const Vector2D &rhs);
 };
+
+/// \brief vector addition
+/// \param lhs - the left hand
+/// \param rhs - the right hand
+/// \return the added vector
+Vector2D operator+(Vector2D lhs, const Vector2D &rhs);
+
+/// \brief vector subtraction
+/// \param lhs - the left hand
+/// \param rhs - the right hand
+/// \return the subtracted vector
+Vector2D operator-(Vector2D lhs, const Vector2D &rhs);
 
 /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
 /// os - stream to output to
@@ -201,6 +224,12 @@ std::istream &operator>>(std::istream &is, Transform2D &tf);
 /// \return the composition of the two transforms
 /// HINT: This function can be implemented in terms of *=
 Transform2D operator*(Transform2D lhs, const Transform2D &rhs);
+
+/// \brief compute the transformation corresponding to a rigid body following a constant twist for one time unit
+/// \param twist - the constant twist
+/// \return the corresponding transformation
+Transform2D integrateTwist(Twist2D twist);
+
 } // namespace rigid2d
 
 #endif

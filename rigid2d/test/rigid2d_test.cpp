@@ -81,6 +81,53 @@ TEST(Rigid2dTest, Multiplication)
     ASSERT_DOUBLE_EQ(rigid2d::PI * 3.0 / 2.0, result_theta);
 }
 
+TEST(Rigid2dTest, integrateTwist)
+{
+    rigid2d::Twist2D twist;
+    twist.omega = 1;
+    twist.v_x = 2;
+    twist.v_y = 7;
+    rigid2d::Transform2D result;
+    result = rigid2d::integrateTwist(twist);
+
+    double result_x, result_y, result_theta;
+    result.displacement(result_x, result_y, result_theta);
+
+    ASSERT_NEAR(-1.5349, result_x, 1.0e-3);
+    ASSERT_NEAR(6.80969, result_y, 1.0e-3);
+    ASSERT_DOUBLE_EQ(1, result_theta);
+}
+
+TEST(Rigid2dTest, Addition)
+{
+    rigid2d::Vector2D vec_1;
+    vec_1.x = 3;
+    vec_1.y = 4;
+    rigid2d::Vector2D vec_2;
+    vec_2.x = 1;
+    vec_2.y = 3;
+    rigid2d::Vector2D result;
+    result = vec_1 + vec_2;
+
+    ASSERT_DOUBLE_EQ(4, result.x);
+    ASSERT_DOUBLE_EQ(7, result.y);
+}
+
+TEST(Rigid2dTest, Subtraction)
+{
+    rigid2d::Vector2D vec_1;
+    vec_1.x = 3;
+    vec_1.y = 4;
+    rigid2d::Vector2D vec_2;
+    vec_2.x = 1;
+    vec_2.y = 3;
+    rigid2d::Vector2D result;
+    result = vec_1 - vec_2;
+
+    ASSERT_DOUBLE_EQ(2, result.x);
+    ASSERT_DOUBLE_EQ(1, result.y);
+}
+
 // google test main function
 int main(int argc, char *argv[])
 {

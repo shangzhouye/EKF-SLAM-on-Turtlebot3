@@ -185,4 +185,42 @@ Vector2D normalize_vector(Vector2D vector_input)
     return vector_output;
 }
 
+Transform2D integrateTwist(Twist2D twist)
+{
+    double result_rad = twist.omega;
+    Vector2D result_vector;
+    result_vector.x = std::sin(twist.omega) * twist.v_x + (std::cos(twist.omega) - 1) * twist.v_y;
+    result_vector.y = (1 - std::cos(twist.omega)) * twist.v_x + std::sin(twist.omega) * twist.v_y;
+
+    Transform2D result_transform(result_vector, result_rad);
+    return result_transform;
+}
+
+Vector2D &Vector2D::operator+=(const Vector2D &rhs)
+{
+    this->x = this->x + rhs.x;
+    this->y = this->y + rhs.y;
+    return *this;
+}
+
+Vector2D operator+(Vector2D lhs, const Vector2D &rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
+
+Vector2D &Vector2D::operator-=(const Vector2D &rhs)
+{
+    this->x = this->x - rhs.x;
+    this->y = this->y - rhs.y;
+    return *this;
+}
+
+Vector2D operator-(Vector2D lhs, const Vector2D &rhs)
+{
+    lhs -= rhs;
+    return lhs;
+}
+
+
 } // namespace rigid2d
