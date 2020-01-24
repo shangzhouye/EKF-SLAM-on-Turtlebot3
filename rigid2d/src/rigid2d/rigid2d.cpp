@@ -222,5 +222,58 @@ Vector2D operator-(Vector2D lhs, const Vector2D &rhs)
     return lhs;
 }
 
+Vector2D &Vector2D::operator*=(const double &rhs)
+{
+    this->x = this->x * rhs;
+    this->y = this->y * rhs;
+    return *this;
+}
+
+Vector2D operator*=(double lhs, const Vector2D &rhs)
+{
+    Vector2D result;
+    result.x = lhs * rhs.x;
+    result.y = lhs * rhs.y;
+    return result;
+}
+
+Vector2D operator*(Vector2D lhs, double rhs)
+{
+    lhs *= rhs;
+    return lhs;
+}
+
+Vector2D operator*(double lhs, Vector2D rhs)
+{
+    rhs *= lhs;
+    return rhs;
+}
+
+double length(const Vector2D &v)
+{
+    return std::sqrt(std::pow(v.x, 2) + std::pow(v.y, 2));
+}
+
+double distance(const Vector2D &v1, const Vector2D &v2)
+{
+    return std::sqrt(std::pow((v1.x - v2.x), 2) + std::pow((v1.y - v2.y), 2));
+}
+
+double angle(const Vector2D &v)
+{
+    return std::atan2(v.y, v.x);
+}
+
+Vector2D::Vector2D()
+{
+    x = 0;
+    y = 0;
+}
+
+Vector2D::Vector2D(double input_x, double input_y)
+{
+    x = input_x;
+    y = input_y;
+}
 
 } // namespace rigid2d

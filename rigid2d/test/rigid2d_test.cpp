@@ -128,6 +128,64 @@ TEST(Rigid2dTest, Subtraction)
     ASSERT_DOUBLE_EQ(1, result.y);
 }
 
+TEST(Rigid2dTest, InplaceMultiplication)
+{
+    rigid2d::Vector2D vec_1;
+    vec_1.x = 3;
+    vec_1.y = 4;
+    vec_1 *= 2;
+
+    ASSERT_DOUBLE_EQ(6, vec_1.x);
+    ASSERT_DOUBLE_EQ(8, vec_1.y);
+}
+
+TEST(Rigid2dTest, VectorMultiplication)
+{
+    rigid2d::Vector2D vec_1;
+    vec_1.x = 3;
+    vec_1.y = 4;
+    double scalar = 3.0;
+
+    rigid2d::Vector2D result_left;
+    result_left = scalar * vec_1;
+
+    rigid2d::Vector2D result_right;
+    result_right = vec_1 * scalar;
+
+    ASSERT_DOUBLE_EQ(9.0, result_left.x);
+    ASSERT_DOUBLE_EQ(12.0, result_left.y);
+    ASSERT_DOUBLE_EQ(9, result_right.x);
+    ASSERT_DOUBLE_EQ(12, result_right.y);
+}
+
+TEST(Rigid2dTest, VectorLength)
+{
+    rigid2d::Vector2D vec(3,4);
+    double length;
+    length = rigid2d::length(vec);
+
+    ASSERT_DOUBLE_EQ(5, length);
+}
+
+TEST(Rigid2dTest, VectordDistance)
+{
+    rigid2d::Vector2D vec1(3,4);
+    rigid2d::Vector2D vec2;
+    double distance;
+    distance = rigid2d::distance(vec1, vec2);
+
+    ASSERT_DOUBLE_EQ(5, distance);
+}
+
+TEST(Rigid2dTest, VectorAngle)
+{
+    rigid2d::Vector2D vec(3,3);
+    double angle;
+    angle = rigid2d::angle(vec);
+
+    ASSERT_DOUBLE_EQ(rigid2d::deg2rad(45), angle);
+}
+
 // google test main function
 int main(int argc, char *argv[])
 {

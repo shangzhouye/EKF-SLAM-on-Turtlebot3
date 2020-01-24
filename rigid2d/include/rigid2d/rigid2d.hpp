@@ -80,6 +80,20 @@ static_assert(almost_equal(rad2deg(15), 859.437, 1.0e-3), "rad2deg failed");
 
 static_assert(almost_equal(deg2rad(rad2deg(2.1)), 2.1), "deg2rad failed");
 
+/// \brief angle wraping
+/// \param rad - angle in radians
+/// \returns the wrapped angle in radians
+constexpr double normalize_angle(double rad)
+{
+    double result = std::remainder(rad, 2.0 * PI);
+    return result;
+}
+
+static_assert(almost_equal(normalize_angle(deg2rad(358)), deg2rad(-2), 1.0e-3), "normalize_angle failed");
+static_assert(almost_equal(normalize_angle(deg2rad(-190)), deg2rad(170), 1.0e-3), "normalize_angle failed");
+static_assert(almost_equal(normalize_angle(deg2rad(370)), deg2rad(10), 1.0e-3), "normalize_angle failed");
+static_assert(almost_equal(normalize_angle(deg2rad(-370)), deg2rad(-10), 1.0e-3), "normalize_angle failed");
+
 /// \brief A 2-Dimensional Vector
 struct Vector2D
 {
@@ -87,16 +101,53 @@ public:
     double x = 0.0;
     double y = 0.0;
 
+    Vector2D();
+
+    Vector2D(double input_x, double input_y);
+
     /// \brief vector addition in place
-    /// \param v - the vector to be added
+    /// \param rhs - the vector to be added
     /// \return the added vector
     Vector2D &operator+=(const Vector2D &rhs);
 
     /// \brief vector subtraction in place
-    /// \param v - the vector to be subtracted
+    /// \param rhs - the vector to be subtracted
     /// \return the subtracted vector
     Vector2D &operator-=(const Vector2D &rhs);
+
+    /// \brief scalar multiplication
+    /// \param rhs - the scalar
+    /// \return the result vector
+    Vector2D &operator*=(const double &rhs);
 };
+
+/// \brief calculate the length of the vector
+/// \param v - the vector
+/// \return the length
+double length(const Vector2D &v);
+
+/// \brief calculate the distance between two vectors
+/// \param v1 - vector 1
+/// \param v2 - vector 2
+/// \return the distance
+double distance(const Vector2D &v1, const Vector2D &v2);
+
+/// \brief calculate the angle of the vector
+/// \param v - the vector
+/// \return the angle
+double angle(const Vector2D &v);
+
+/// \brief scalar multiplication (scalar at left)
+/// \param lhs - the left hand
+/// \param rhs - the right hand
+/// \return the result vector
+Vector2D operator*(double lhs, Vector2D rhs);
+
+/// \brief scalar multiplication (scalar at right)
+/// \param lhs - the left hand
+/// \param rhs - the right hand
+/// \return the result vector
+Vector2D operator*(Vector2D lhs, double rhs);
 
 /// \brief vector addition
 /// \param lhs - the left hand
