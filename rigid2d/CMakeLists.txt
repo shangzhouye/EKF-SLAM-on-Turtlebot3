@@ -216,13 +216,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # add gtest
 if (CATKIN_ENABLE_TESTING)
+    # to avoid "undefined reference to `pthread_getspecific'" error
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     catkin_add_gtest(${PROJECT_NAME}_test test/${PROJECT_NAME}_test.cpp)
     target_link_libraries(${PROJECT_NAME}_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib)
 
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     catkin_add_gtest(diff_drive_test test/diff_drive_test.cpp)
     target_link_libraries(diff_drive_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib diff_drive_lib)
 endif()
 
 # use clang as the compiler
-# set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-# set(CMAKE_C_COMPILER "/usr/bin/clang")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_C_COMPILER "/usr/bin/clang")
