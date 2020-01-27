@@ -187,6 +187,7 @@ public:
     double v_x = 0.0;
     double v_y = 0.0;
 
+    // learned: default constructor is needed for all the classes when using gcc
     Twist2D();
 
     Twist2D(double init_omega, double init_v_x, double init_v_y);
