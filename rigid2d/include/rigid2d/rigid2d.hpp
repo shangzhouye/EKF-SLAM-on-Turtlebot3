@@ -182,9 +182,14 @@ Vector2D normalize_vector(Vector2D vector_input);
 /// \brief A 2-Dimensional Twist
 struct Twist2D
 {
+public:
     double omega = 0.0;
     double v_x = 0.0;
     double v_y = 0.0;
+
+    Twist2D();
+
+    Twist2D(double init_omega, double init_v_x, double init_v_y);
 };
 
 /// \brief output a 2 dimensional twist as [omega v_x v_y]

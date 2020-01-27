@@ -276,4 +276,18 @@ Vector2D::Vector2D(double input_x, double input_y)
     y = input_y;
 }
 
+Twist2D::Twist2D()
+{
+    v_x = 0;
+    v_y = 0;
+    omega = 0;
+}
+
+Twist2D::Twist2D(double init_omega, double init_v_x, double init_v_y)
+{
+    v_x = init_v_x;
+    v_y = init_v_y;
+    omega = init_omega;
+}
+
 } // namespace rigid2d
