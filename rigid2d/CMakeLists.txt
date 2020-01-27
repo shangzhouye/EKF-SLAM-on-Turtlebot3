@@ -135,6 +135,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/rigid2d_node.cpp)
 
 add_library(${PROJECT_NAME}_lib src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
+add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp)
 add_executable(node src/${PROJECT_NAME}_node.cpp)
 target_link_libraries(node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib)
 
@@ -217,4 +218,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}_test test/${PROJECT_NAME}_test.cpp)
     target_link_libraries(${PROJECT_NAME}_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib)
+
+    catkin_add_gtest(diff_drive_test test/diff_drive_test.cpp)
+    target_link_libraries(diff_drive_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib diff_drive_lib)
 endif()
+
+# use clang as the compiler
+# set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+# set(CMAKE_C_COMPILER "/usr/bin/clang")
