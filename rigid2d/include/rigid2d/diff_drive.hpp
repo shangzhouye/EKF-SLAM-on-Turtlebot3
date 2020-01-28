@@ -13,8 +13,11 @@ namespace rigid2d
 
 struct WheelVelocities
 {
+public:
     double v_left;
     double v_right;
+
+    WheelVelocities();
 };
 
 class DiffDrive

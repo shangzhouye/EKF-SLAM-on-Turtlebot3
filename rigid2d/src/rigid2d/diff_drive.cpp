@@ -10,6 +10,12 @@
 namespace rigid2d
 {
 
+WheelVelocities::WheelVelocities()
+{
+    v_left = 0;
+    v_right = 0;
+}
+
 DiffDrive::DiffDrive()
 {
     Vector2D init_vec;
