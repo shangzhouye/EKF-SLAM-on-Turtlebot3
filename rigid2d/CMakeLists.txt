@@ -136,8 +136,10 @@ include_directories(
 
 add_library(${PROJECT_NAME}_lib src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
 add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp)
+add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp)
+
 add_executable(node src/${PROJECT_NAME}_node.cpp)
-target_link_libraries(node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib)
+target_link_libraries(node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -227,5 +229,5 @@ if (CATKIN_ENABLE_TESTING)
 endif()
 
 # use clang as the compiler
-# set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-# set(CMAKE_C_COMPILER "/usr/bin/clang")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_C_COMPILER "/usr/bin/clang")

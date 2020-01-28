@@ -3,10 +3,12 @@
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "ros/ros.h"
+#include "rigid2d/diff_drive.hpp"
+#include "rigid2d/waypoints.hpp"
 
 int main(int argc, char **argv)
 {
-    
+
     /* Start: Testing code ******************************
     // rigid2d::Vector2D vect;
     // std::cin >> vect;
@@ -23,7 +25,12 @@ int main(int argc, char **argv)
     // std::cout << in_trans;
     // End: Testing code ******************************
     */
-   
+
+    // test waypoints class
+    rigid2d::Waypoints my_waypoints;
+    my_waypoints.pipeline(600);
+    std::cout << "Waypoints tested above;" << std::endl;
+
     // init the node
     ros::init(argc, argv, "node");
     ros::NodeHandle nh;
@@ -67,7 +74,7 @@ int main(int argc, char **argv)
     rigid2d::Twist2D twi;
     std::cin >> twi;
     if (frame_id == 97)
-    {   
+    {
         std::cout << "(First line is vector, second line is twist)" << std::endl;
         std::cout << "In frame a:" << std::endl;
         std::cout << vect;

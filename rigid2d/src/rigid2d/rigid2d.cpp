@@ -156,7 +156,7 @@ Transform2D &Transform2D::operator*=(const Transform2D &rhs)
 {
     this->trans_.x = rhs.trans_.x * std::cos(this->radians_) - rhs.trans_.y * std::sin(this->radians_) + this->trans_.x;
     this->trans_.y = rhs.trans_.x * std::sin(this->radians_) + rhs.trans_.y * std::cos(this->radians_) + this->trans_.y;
-    this->radians_ = this->radians_ + rhs.radians_;
+    this->radians_ = normalize_angle(this->radians_ + rhs.radians_);
     return *this;
 }
 

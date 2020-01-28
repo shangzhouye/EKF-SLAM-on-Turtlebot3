@@ -78,7 +78,7 @@ TEST(Rigid2dTest, Multiplication)
 
     ASSERT_NEAR(0.0, result_x, 1.0e-12);
     ASSERT_DOUBLE_EQ(-1.0, result_y);
-    ASSERT_DOUBLE_EQ(rigid2d::PI * 3.0 / 2.0, result_theta);
+    ASSERT_DOUBLE_EQ(rigid2d::normalize_angle(rigid2d::PI * 3.0 / 2.0), result_theta);
 }
 
 TEST(Rigid2dTest, integrateTwist)
