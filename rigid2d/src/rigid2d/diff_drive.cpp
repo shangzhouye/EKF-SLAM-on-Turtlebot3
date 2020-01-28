@@ -52,18 +52,19 @@ Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel)
 
 void DiffDrive::updateOdometry(double left, double right)
 {
-    double delta_x_b = wheel_radius_ * (left + right) / 2.0;
-    Vector2D delta_vec_b(delta_x_b, 0);
-    double delta_theta_b = wheel_radius_ * (right - left) / wheel_base_;
-    Transform2D step_displacement(delta_vec_b, delta_theta_b);
-    pose_ *= step_displacement;
+    WheelVelocities wheel_v;
+    wheel_v.v_left = left;
+    wheel_v.v_right = right;
+    Twist2D twist = wheelsToTwist(wheel_v);
+    Transform2D transformation = integrateTwist(twist);
+    std::cout << "Debug: " << transformation << std::endl;
+    pose_ *= transformation;
 }
 
 void DiffDrive::feedforward(Twist2D cmd)
 {
-    Vector2D delta_vec_b(cmd.v_x, 0);
-    Transform2D step_displacement(delta_vec_b, cmd.omega);
-    pose_ *= step_displacement;
+    Transform2D transformation = integrateTwist(cmd);
+    pose_ *= transformation;
 }
 
 Transform2D DiffDrive::get_pose()

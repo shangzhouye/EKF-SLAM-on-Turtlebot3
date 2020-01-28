@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstring>
 #include <string>
+#include <cmath>
 
 TEST(DiffDriveTest, twistToWheels_translate)
 {
@@ -98,7 +99,31 @@ TEST(DiffDriveTest, MovingForward)
     ASSERT_DOUBLE_EQ(x, wheel_radius * 2.0);
 }
 
-TEST(DiffDriveTest, MovingForwardAndTurning)
+TEST(DiffDriveTest, MovingForwardAndTurning1)
+{
+    rigid2d::WheelVelocities wheel_vel;
+    wheel_vel.v_left = 0;
+    wheel_vel.v_right = 1;
+
+    rigid2d::DiffDrive diff_drive_test;
+
+    // same as default value
+    double wheel_radius = 0.1;
+    double wheel_base = 0.4;
+
+    diff_drive_test.updateOdometry(wheel_vel.v_left, wheel_vel.v_right);
+
+    rigid2d::Transform2D result1 = diff_drive_test.get_pose();
+
+    double x, y, theta;
+    result1.displacement(x, y, theta);
+
+    ASSERT_DOUBLE_EQ(x, wheel_base * std::sin(wheel_radius / wheel_base) / 2.0);
+    ASSERT_NEAR(y, wheel_base / 2.0 - (wheel_base * std::cos(wheel_radius / wheel_base) / 2.0), 0.000001);
+    ASSERT_DOUBLE_EQ(theta, wheel_radius / wheel_base);
+}
+
+TEST(DiffDriveTest, MovingForwardAndTurning2)
 {
     rigid2d::WheelVelocities wheel_vel;
     wheel_vel.v_left = 0;
@@ -112,24 +137,16 @@ TEST(DiffDriveTest, MovingForwardAndTurning)
     double wheel_radius = 0.1;
     double wheel_base = 0.4;
 
-    diff_drive_test.updateOdometry(wheel_vel.v_left, wheel_vel.v_right);
-
-    rigid2d::Transform2D result1 = diff_drive_test.get_pose();
-
     double x, y, theta;
-    result1.displacement(x, y, theta);
-
-    ASSERT_DOUBLE_EQ(x, wheel_radius / 2.0);
-    ASSERT_DOUBLE_EQ(theta, wheel_radius / wheel_base);
-
     diff_drive_test.feedforward(cmd);
 
     rigid2d::Transform2D result2 = diff_drive_test.get_pose();
 
     result2.displacement(x, y, theta);
 
-    ASSERT_NEAR(x, wheel_radius, 0.005);
-    ASSERT_DOUBLE_EQ(theta, wheel_radius * 2.0 / wheel_base);
+    ASSERT_DOUBLE_EQ(x, wheel_base * std::sin(wheel_radius / wheel_base) / 2.0);
+    ASSERT_NEAR(y, wheel_base / 2.0 - (wheel_base * std::cos(wheel_radius / wheel_base) / 2.0), 0.000001);
+    ASSERT_DOUBLE_EQ(theta, wheel_radius / wheel_base);
 }
 
 // google test main function

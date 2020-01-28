@@ -187,13 +187,25 @@ Vector2D normalize_vector(Vector2D vector_input)
 
 Transform2D integrateTwist(Twist2D twist)
 {
-    double result_rad = twist.omega;
-    Vector2D result_vector;
-    result_vector.x = std::sin(twist.omega) * twist.v_x + (std::cos(twist.omega) - 1) * twist.v_y;
-    result_vector.y = (1 - std::cos(twist.omega)) * twist.v_x + std::sin(twist.omega) * twist.v_y;
+    if (almost_equal(twist.omega, 0.0))
+    {
+        Vector2D result_vector(twist.v_x, twist.v_y);
+        Transform2D result_transform(result_vector, 0);
+        return result_transform;
+    }
+    else
+    {
+        double result_rad = twist.omega;
+        Vector2D result_vector;
+        // learned: remember to normalize
+        twist.v_x = twist.v_x / twist.omega;
+        twist.v_y = twist.v_y / twist.omega;
+        result_vector.x = std::sin(twist.omega) * twist.v_x + (std::cos(twist.omega) - 1) * twist.v_y;
+        result_vector.y = (1 - std::cos(twist.omega)) * twist.v_x + std::sin(twist.omega) * twist.v_y;
 
-    Transform2D result_transform(result_vector, result_rad);
-    return result_transform;
+        Transform2D result_transform(result_vector, result_rad);
+        return result_transform;
+    }
 }
 
 Vector2D &Vector2D::operator+=(const Vector2D &rhs)
