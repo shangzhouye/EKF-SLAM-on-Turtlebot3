@@ -148,6 +148,11 @@ set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX ""
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
 
+add_executable(${PROJECT_NAME}_odometer src/odometer.cpp)
+set_target_properties(${PROJECT_NAME}_odometer PROPERTIES OUTPUT_NAME odometer PREFIX "")
+add_dependencies(${PROJECT_NAME}_odometer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_odometer ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
