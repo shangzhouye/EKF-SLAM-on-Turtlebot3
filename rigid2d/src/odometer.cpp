@@ -8,7 +8,10 @@
 #include <string>
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/JointState.h"
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_ros/transform_broadcaster.h"
+#include "geometry_msgs/TransformStamped.h"
 
 class Odometer
 {
@@ -29,6 +32,8 @@ private:
     double last_r_;
     double current_l_;
     double current_r_;
+
+    ros::Time last_time_now_;
 
 public:
     Odometer(ros::NodeHandle &nh)
@@ -53,6 +58,7 @@ public:
 
         last_l_ = 0;
         last_r_ = 0;
+        last_time_now_ = ros::Time::now();
     }
 
     void joint_states_callback(const sensor_msgs::JointState msg)
@@ -80,20 +86,46 @@ public:
         q_rot.normalize();
         tf2::convert(q_rot, odo_msg.pose.pose.orientation);
 
-        // double vel_l = msg.velocity.at(1);
-        // double vel_r = msg.velocity.at(0);
-        // rigid2d::WheelVelocities wheel_vel;
-        // wheel_vel.v_left = vel_l;
-        // wheel_vel.v_right = vel_r;
-        // rigid2d::Twist2D twist = my_robot_.wheelsToTwist(wheel_vel);
-        // odo_msg.twist.twist.linear.x = twist.v_x;
-        // odo_msg.twist.twist.linear.y = twist.v_y;
-        // odo_msg.twist.twist.angular.z = twist.omega;
+        // std::cout << ros::Time::now() - last_time_now_;
+        ros::Time current_time_now = ros::Time::now();
+        double vel_l = (current_l_ - last_l_) / (current_time_now - last_time_now_).toSec();
+        double vel_r = (current_r_ - last_r_) / (current_time_now - last_time_now_).toSec();
+
+        std::cout << "Time difference: " << (current_time_now - last_time_now_).toSec() << std::endl;
+        std::cout << "Wheel Velocities: " << vel_l << " and " << vel_r << std::endl;
+
+        rigid2d::WheelVelocities wheel_vel;
+        wheel_vel.v_left = vel_l;
+        wheel_vel.v_right = vel_r;
+        rigid2d::Twist2D twist = my_robot_.wheelsToTwist(wheel_vel);
+        odo_msg.twist.twist.linear.x = twist.v_x;
+        odo_msg.twist.twist.linear.y = twist.v_y;
+        odo_msg.twist.twist.angular.z = twist.omega;
+
+        last_time_now_ = current_time_now;
 
         last_l_ = current_l_;
         last_r_ = current_r_;
 
         nav_odo_pub_.publish(odo_msg);
+
+        // broadcast the tf
+        static tf2_ros::TransformBroadcaster br;
+        geometry_msgs::TransformStamped transformStamped;
+        transformStamped.header.stamp = ros::Time::now();
+        transformStamped.header.frame_id = odom_frame_id_;
+        transformStamped.child_frame_id = body_frame_id_;
+        transformStamped.transform.translation.x = pose_x;
+        transformStamped.transform.translation.y = pose_y;
+        transformStamped.transform.translation.z = 0.0;
+
+        transformStamped.transform.rotation.x = q_rot.x();
+        transformStamped.transform.rotation.y = q_rot.y();
+        transformStamped.transform.rotation.z = q_rot.z();
+        transformStamped.transform.rotation.w = q_rot.w();
+
+        br.sendTransform(transformStamped);
+        ros::spinOnce();
     }
 };
 

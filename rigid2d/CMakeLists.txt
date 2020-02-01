@@ -9,6 +9,7 @@ project(rigid2d)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  tf2_ros
 )
 
 ## System dependencies are found with CMake's conventions
