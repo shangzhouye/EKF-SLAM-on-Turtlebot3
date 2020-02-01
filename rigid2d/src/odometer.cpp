@@ -1,5 +1,24 @@
 /// \file
 /// \brief Node for odometry
+///
+/// PARAMETERS:
+///     odom_frame_id_: frame id of the odom frame
+///     body_frame_id_: frame id of the body frame
+///     left_wheel_joint_: name of the left wheel joint
+///     right_wheel_joint_: name of the right wheel joint
+///     wheel_base_: wheel_base parameter for the diff drive robot
+///     wheel_radius_: wheel radius of the diff drive robot
+///     last_l_: absolute position of the left wheel in last time step
+///     last_r_: absolute position of the right wheel in last time step
+///     current_l_: absolute position of the left wheel in current time step
+///     current_r_: absolute position of the right wheel in current time step
+///     last_time_now_: time stamp of last time step
+/// PUBLISHES:
+///     nav_odo (nav_msgs/Odometry): publish current robot pose
+/// SUBSCRIBES:
+///     joint_states (sensor_msgs/JointState): the joint states of l/r wheels
+
+
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "ros/ros.h"
