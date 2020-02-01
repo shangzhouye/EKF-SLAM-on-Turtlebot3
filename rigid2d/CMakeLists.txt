@@ -135,11 +135,18 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/rigid2d_node.cpp)
 
 add_library(${PROJECT_NAME}_lib src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
-add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp)
-add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp)
+add_dependencies(${PROJECT_NAME}_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(node src/${PROJECT_NAME}_node.cpp)
-target_link_libraries(node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
+add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp)
+add_dependencies(diff_drive_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp)
+add_dependencies(waypoints_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

@@ -25,10 +25,14 @@ class Waypoints
     // - list the members and functions needed
     // - write the pipeline function together with methods
 public:
-    Waypoints();
+    Waypoints() : waypoints_(std::vector<Vector2D>{Vector2D(3, 2), Vector2D(7, 2), Vector2D(7, 7), Vector2D(3, 7)}),
+                  state_(Trans), current_waypoint_num_(0), frequency_(10){};
 
     Waypoints(CurrentState state, int current_waypoint_num, std::vector<Vector2D> waypoints, std::vector<Twist2D> cmd_sequence,
-              std::vector<double> pose_sequence_x, std::vector<double> pose_sequence_y, DiffDrive my_diffdrive, double frequency);
+              std::vector<double> pose_sequence_x, std::vector<double> pose_sequence_y, DiffDrive my_diffdrive, double frequency)
+        : state_(state), current_waypoint_num_(current_waypoint_num), waypoints_(waypoints),
+          cmd_sequence_(cmd_sequence), pose_sequence_x_(pose_sequence_x), pose_sequence_y_(pose_sequence_y),
+          my_diffdrive_(my_diffdrive), frequency_(frequency) {}
 
     /// \brief the pipeline for generating sequence of commands
     /// \param num_iter - number of iterations
