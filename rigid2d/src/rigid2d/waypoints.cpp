@@ -12,37 +12,14 @@ namespace rigid2d
 {
 
 Waypoints::Waypoints()
-{
-    Vector2D point1(3, 2);
-    Vector2D point2(7, 2);
-    Vector2D point3(7, 7);
-    Vector2D point4(3, 7);
-    waypoints_.push_back(point1);
-    waypoints_.push_back(point2);
-    waypoints_.push_back(point3);
-    waypoints_.push_back(point4);
-
-    Twist2D init_pose(0, point1.x, point1.y);
-    my_diffdrive_.reset(init_pose);
-
-    state_ = Trans;
-    current_waypoint_num_ = 0;
-
-    frequency_ = 10;
-}
+    : waypoints_(std::vector<Vector2D>{Vector2D(3, 2), Vector2D(7, 2), Vector2D(7, 7), Vector2D(3, 7)}),
+      my_diffdrive_(DiffDrive(Transform2D(Vector2D(0, 0), 0), 0.4, 0.1)), state_(Trans), current_waypoint_num_(0), frequency_(10) {}
 
 Waypoints::Waypoints(CurrentState state, int current_waypoint_num, std::vector<Vector2D> waypoints, std::vector<Twist2D> cmd_sequence,
                      std::vector<double> pose_sequence_x, std::vector<double> pose_sequence_y, DiffDrive my_diffdrive, double frequency)
-{
-    state_ = state;
-    current_waypoint_num_ = current_waypoint_num;
-    waypoints_ = waypoints;
-    cmd_sequence_ = cmd_sequence;
-    pose_sequence_x_ = pose_sequence_x;
-    pose_sequence_y_ = pose_sequence_y;
-    my_diffdrive_ = my_diffdrive;
-    frequency_ = frequency;
-}
+    : state_(state), current_waypoint_num_(current_waypoint_num), waypoints_(waypoints),
+      cmd_sequence_(cmd_sequence), pose_sequence_x_(pose_sequence_x), pose_sequence_y_(pose_sequence_y),
+      my_diffdrive_(my_diffdrive), frequency_(frequency) {}
 
 void Waypoints::pipeline(int num_iter)
 {

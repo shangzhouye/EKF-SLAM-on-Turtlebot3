@@ -97,33 +97,13 @@ std::istream &operator>>(std::istream &is, Twist2D &t)
     return is;
 }
 
-Transform2D::Transform2D()
-{
-    trans_.x = 0;
-    trans_.y = 0;
-    radians_ = 0;
-}
+Transform2D::Transform2D() : trans_(0, 0), radians_(0) {}
 
-Transform2D::Transform2D(const Vector2D &trans)
-{
-    trans_.x = trans.x;
-    trans_.y = trans.y;
-    radians_ = 0;
-}
+Transform2D::Transform2D(const Vector2D &trans) : trans_(trans), radians_(0) {}
 
-Transform2D::Transform2D(double radians)
-{
-    trans_.x = 0;
-    trans_.y = 0;
-    radians_ = radians;
-}
+Transform2D::Transform2D(double radians) : trans_(0, 0), radians_(radians) {}
 
-Transform2D::Transform2D(const Vector2D &trans, double radians)
-{
-    trans_.x = trans.x;
-    trans_.y = trans.y;
-    radians_ = radians;
-}
+Transform2D::Transform2D(const Vector2D &trans, double radians) : trans_(trans), radians_(radians) {}
 
 Vector2D Transform2D::operator()(Vector2D v) const
 {
@@ -276,30 +256,13 @@ double angle(const Vector2D &v)
     return std::atan2(v.y, v.x);
 }
 
-Vector2D::Vector2D()
-{
-    x = 0;
-    y = 0;
-}
+Vector2D::Vector2D() : x(0), y(0) {}
 
-Vector2D::Vector2D(double input_x, double input_y)
-{
-    x = input_x;
-    y = input_y;
-}
+Vector2D::Vector2D(double input_x, double input_y) : x(input_x), y(input_y) {}
 
-Twist2D::Twist2D()
-{
-    v_x = 0;
-    v_y = 0;
-    omega = 0;
-}
+Twist2D::Twist2D() : v_x(0), v_y(0), omega(0) {}
 
 Twist2D::Twist2D(double init_omega, double init_v_x, double init_v_y)
-{
-    v_x = init_v_x;
-    v_y = init_v_y;
-    omega = init_omega;
-}
+    : v_x(init_v_x), v_y(init_v_y), omega(init_omega) {}
 
 } // namespace rigid2d

@@ -98,8 +98,8 @@ double normalize_angle(double rad)
 struct Vector2D
 {
 public:
-    double x = 0.0;
-    double y = 0.0;
+    double x;
+    double y;
 
     Vector2D();
 
@@ -183,9 +183,9 @@ Vector2D normalize_vector(Vector2D vector_input);
 struct Twist2D
 {
 public:
-    double omega = 0.0;
-    double v_x = 0.0;
-    double v_y = 0.0;
+    double omega;
+    double v_x;
+    double v_y;
 
     // learned: default constructor is needed for all the classes when using gcc
     Twist2D();

@@ -10,29 +10,12 @@
 namespace rigid2d
 {
 
-WheelVelocities::WheelVelocities()
-{
-    v_left = 0;
-    v_right = 0;
-}
+WheelVelocities::WheelVelocities() : v_left(0), v_right(0) {}
 
-DiffDrive::DiffDrive()
-{
-    Vector2D init_vec;
-    init_vec.x = 0;
-    init_vec.y = 0;
-    Transform2D init_pose(init_vec, 0);
-    pose_ = init_pose;
-    wheel_base_ = 0.4;
-    wheel_radius_ = 0.1;
-}
+DiffDrive::DiffDrive() : pose_(Vector2D(0, 0), 0), wheel_base_(0.4), wheel_radius_(0.1) {}
 
 DiffDrive::DiffDrive(Transform2D init_pose, double init_wheel_base, double init_wheel_radius)
-{
-    pose_ = init_pose;
-    wheel_base_ = init_wheel_base;
-    wheel_radius_ = init_wheel_radius;
-}
+    : pose_(init_pose), wheel_base_(init_wheel_base), wheel_radius_(init_wheel_radius) {}
 
 WheelVelocities DiffDrive::twistToWheels(Twist2D twist)
 {
@@ -63,7 +46,8 @@ void DiffDrive::updateOdometry(double left, double right)
 
 void DiffDrive::feedforward(Twist2D cmd)
 {
-    Transform2D transformation = integrateTwist(cmd);
+    Transform2D transformation;
+    transformation = integrateTwist(cmd);
     pose_ *= transformation;
 }
 

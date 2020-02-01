@@ -229,5 +229,5 @@ if (CATKIN_ENABLE_TESTING)
 endif()
 
 # use clang as the compiler
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-set(CMAKE_C_COMPILER "/usr/bin/clang")
+# set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+# set(CMAKE_C_COMPILER "/usr/bin/clang")
