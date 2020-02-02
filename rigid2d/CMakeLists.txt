@@ -159,6 +159,20 @@ set_target_properties(${PROJECT_NAME}_fake_diff_encoders PROPERTIES OUTPUT_NAME 
 add_dependencies(${PROJECT_NAME}_fake_diff_encoders ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_fake_diff_encoders ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
 
+install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_odometer ${PROJECT_NAME}_fake_diff_encoders
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib
+ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

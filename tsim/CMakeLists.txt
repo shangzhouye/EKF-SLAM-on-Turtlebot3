@@ -141,6 +141,10 @@ include_directories(
 add_executable(turtle_rect src/turtle_rect.cpp)
 target_link_libraries(turtle_rect ${catkin_LIBRARIES})
 
+install(TARGETS turtle_rect
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

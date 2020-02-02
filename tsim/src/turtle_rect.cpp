@@ -1,4 +1,4 @@
-/// \file turtle_rect.cpp
+/// \file
 /// \brief Make the turtle move in a rectangular trajectory.
 ///
 /// PARAMETERS:
@@ -25,15 +25,15 @@
 #include "std_srvs/Empty.h"
 #include "turtlesim/Pose.h"
 #include "tsim/PoseError.h"
-#define PI 3.14159265358979323846
+const double PI = 3.14159265358979323846;
 
 // define global variables
 // better to wrap everything into a class
-double actual_x;
-double actual_y;
-double actual_theta;
-int if_reset;
-double target_x, target_y, target_theta;
+static double actual_x;
+static double actual_y;
+static double actual_theta;
+static int if_reset;
+static double target_x, target_y, target_theta;
 
 /// \brief four states defined
 enum CurrentState
