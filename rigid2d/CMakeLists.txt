@@ -154,6 +154,11 @@ set_target_properties(${PROJECT_NAME}_odometer PROPERTIES OUTPUT_NAME odometer P
 add_dependencies(${PROJECT_NAME}_odometer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_odometer ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
 
+add_executable(${PROJECT_NAME}_fake_diff_encoders src/fake_diff_encoders.cpp)
+set_target_properties(${PROJECT_NAME}_fake_diff_encoders PROPERTIES OUTPUT_NAME fake_diff_encoders PREFIX "")
+add_dependencies(${PROJECT_NAME}_fake_diff_encoders ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_fake_diff_encoders ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

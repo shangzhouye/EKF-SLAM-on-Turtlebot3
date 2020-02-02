@@ -84,8 +84,12 @@ public:
     {
         current_l_ = msg.position.at(1);
         current_r_ = msg.position.at(0);
+
         double dist_l = current_l_ - last_l_;
+        dist_l = rigid2d::normalize_angle(dist_l);
         double dist_r = current_r_ - last_r_;
+        dist_r = rigid2d::normalize_angle(dist_r);
+
         my_robot_.updateOdometry(dist_l, dist_r);
 
         nav_msgs::Odometry odo_msg;
@@ -107,8 +111,14 @@ public:
 
         // std::cout << ros::Time::now() - last_time_now_;
         ros::Time current_time_now = ros::Time::now();
-        double vel_l = (current_l_ - last_l_) / (current_time_now - last_time_now_).toSec();
-        double vel_r = (current_r_ - last_r_) / (current_time_now - last_time_now_).toSec();
+        double vel_diff_l = current_l_ - last_l_;
+        double vel_diff_r = current_r_ - last_r_;
+        
+        vel_diff_l = rigid2d::normalize_angle(vel_diff_l);
+        vel_diff_r = rigid2d::normalize_angle(vel_diff_r);
+
+        double vel_l = (vel_diff_l) / (current_time_now - last_time_now_).toSec();
+        double vel_r = (vel_diff_r) / (current_time_now - last_time_now_).toSec();
 
         std::cout << "Time difference: " << (current_time_now - last_time_now_).toSec() << std::endl;
         std::cout << "Wheel Velocities: " << vel_l << " and " << vel_r << std::endl;

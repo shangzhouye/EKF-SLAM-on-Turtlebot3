@@ -1,0 +1,24 @@
+<!-- The launch file is used for testing odometry and faka encoder -->
+
+<launch>
+
+
+    <param name="robot_description" command="xacro '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'" />
+
+    <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_robot.rviz" required="true"/>
+
+    <rosparam command="load" file="$(find tsim)/config/trect.yaml" />
+
+    <node name="turtle_rect" pkg="tsim" type="turtle_rect" output="screen" />
+
+    <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+
+    <node name="odometer" pkg="rigid2d" type="odometer" />
+
+    <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" />
+
+</launch>
