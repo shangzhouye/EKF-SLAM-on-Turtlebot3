@@ -24,14 +24,14 @@ void Waypoints::pipeline(int num_iter)
 Twist2D Waypoints::move_forward_cmd()
 {
     // can modify this to a porpotional controller
-    Twist2D cmd(0.0, 1.0, 0.0);
+    Twist2D cmd(0.0, 0.5, 0.0);
     return cmd;
 }
 
 Twist2D Waypoints::rotate_cmd()
 {
     // can modify this to a porpotional controller
-    Twist2D cmd(1.0, 0.0, 0.0);
+    Twist2D cmd(0.5, 0.0, 0.0);
     return cmd;
 }
 
@@ -97,13 +97,20 @@ int Waypoints::update_state()
 
 bool Waypoints::if_close(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y)
 {
-    return std::sqrt(std::pow(pos_1_x - pos_2_x, 2) + std::pow(pos_1_y - pos_2_y, 2)) < 0.5;
+    return std::sqrt(std::pow(pos_1_x - pos_2_x, 2) + std::pow(pos_1_y - pos_2_y, 2)) < 0.3;
 }
 
 bool Waypoints::if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta)
 {
     double angle_diff = normalize_angle(std::atan2(pos_2_y - pos_1_y, pos_2_x - pos_1_x) - theta);
-    return angle_diff < 0.2 && -0.2 < angle_diff;
+    return angle_diff < 0.1 && -0.1 < angle_diff;
+}
+
+int Waypoints::pose_belief(double &x, double &y, double &theta)
+{
+    Transform2D pose = my_diffdrive_.get_pose();
+    pose.displacement(x, y, theta);
+    return 0;
 }
 
 } // namespace rigid2d

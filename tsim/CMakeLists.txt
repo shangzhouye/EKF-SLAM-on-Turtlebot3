@@ -121,6 +121,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  "../rigid2d/include/"
 )
 
 ## Declare a C++ library
@@ -141,7 +142,13 @@ include_directories(
 add_executable(turtle_rect src/turtle_rect.cpp)
 target_link_libraries(turtle_rect ${catkin_LIBRARIES})
 
-install(TARGETS turtle_rect
+add_executable(${PROJECT_NAME}_turtle_way src/turtle_way.cpp)
+set_target_properties(${PROJECT_NAME}_turtle_way PROPERTIES OUTPUT_NAME turtle_way PREFIX "")
+add_dependencies(${PROJECT_NAME}_turtle_way ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_turtle_way ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+
+
+install(TARGETS turtle_rect ${PROJECT_NAME}_turtle_way
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

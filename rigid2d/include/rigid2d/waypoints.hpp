@@ -28,6 +28,9 @@ public:
     Waypoints() : waypoints_(std::vector<Vector2D>{Vector2D(3, 2), Vector2D(7, 2), Vector2D(7, 7), Vector2D(3, 7)}),
                   state_(Trans), current_waypoint_num_(0), frequency_(10){};
 
+    Waypoints(std::vector<Vector2D> waypoints, double frequency, DiffDrive my_diffdrive) : waypoints_(waypoints), state_(Trans), current_waypoint_num_(0),
+                                                                                           frequency_(frequency), my_diffdrive_(my_diffdrive){};
+
     Waypoints(CurrentState state, int current_waypoint_num, std::vector<Vector2D> waypoints, std::vector<Twist2D> cmd_sequence,
               std::vector<double> pose_sequence_x, std::vector<double> pose_sequence_y, DiffDrive my_diffdrive, double frequency)
         : state_(state), current_waypoint_num_(current_waypoint_num), waypoints_(waypoints),
@@ -79,6 +82,14 @@ public:
     /// \param theta - current heading
     /// \returns true if it is right
     bool if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta);
+
+
+    /// \brief give the internal belief of the robot's current pose
+    /// \param x - pose x
+    /// \param y - pose y
+    /// \param theta - pose theta
+    /// \returns if successful
+    int pose_belief(double &x, double &y, double &theta);
 
 private:
     CurrentState state_;
