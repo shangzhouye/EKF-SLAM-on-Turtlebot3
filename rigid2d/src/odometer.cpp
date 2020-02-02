@@ -80,6 +80,7 @@ public:
         last_time_now_ = ros::Time::now();
     }
 
+    /// \brief read messages from joint states publisher (encoder), publish current pose and velocity, broadcast to tf
     void joint_states_callback(const sensor_msgs::JointState msg)
     {
         current_l_ = msg.position.at(1);

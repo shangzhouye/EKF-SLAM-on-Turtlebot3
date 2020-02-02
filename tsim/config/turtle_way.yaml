@@ -1,9 +1,11 @@
 waypoint_x:
+  - 5
   - 3
   - 7
   - 7
   - 3
 waypoint_y:
+  - 5
   - 2
   - 2
   - 7

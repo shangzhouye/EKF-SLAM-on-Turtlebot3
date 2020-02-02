@@ -11,9 +11,9 @@
 ///     last_time_now_: time stamp of last time step
 ///     seq_: sequence of the current joint state
 /// PUBLISHES:
-///
+///     joint_states (sensor_msgs/JointState): publish joint states as an encoder
 /// SUBSCRIBES:
-///
+///     turtle1/cmd_vel (geometry_msgs/Twist): subscribe to current cmd_vel commands
 
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
@@ -55,6 +55,7 @@ public:
         seq_ = 0;
     }
 
+    /// \brief read the cmd_vel command, publish wheel velocity like an encoder
     void cmd_vel_callback(const geometry_msgs::Twist msg)
     {
 

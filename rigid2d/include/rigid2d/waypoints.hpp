@@ -15,7 +15,8 @@ namespace rigid2d
 
 enum CurrentState
 {
-    Rot,
+    Rot_l,
+    Rot_r,
     Trans
 };
 
@@ -62,9 +63,13 @@ public:
     /// \returns a Twist2D command
     Twist2D move_forward_cmd();
 
-    /// \brief generate a command to rotate
+    /// \brief generate a command to rotate to turn left
     /// \returns a Twist2D command
-    Twist2D rotate_cmd();
+    Twist2D rotate_l_cmd();
+
+    /// \brief generate a command to rotate to turn right
+    /// \returns a Twist2D command
+    Twist2D rotate_r_cmd();
 
     /// \brief if current pose is close to the target waypoint
     /// \param pos_1_x
@@ -80,8 +85,8 @@ public:
     /// \param pos_2_x - waypoint position
     /// \param pos_2_y
     /// \param theta - current heading
-    /// \returns true if it is right
-    bool if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta);
+    /// \returns the next state
+    CurrentState if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta);
 
 
     /// \brief give the internal belief of the robot's current pose

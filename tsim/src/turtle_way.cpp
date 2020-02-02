@@ -1,7 +1,6 @@
 /// \file
-/// \brief Make the turtle move in a rectangular trajectory.
+/// \brief Make the turtle move in a pentagonal trajectory.
 ///
-/// PARAMETERS:
 /// PUBLISHES:
 ///     pose_error (tsim::PoseError): Publish the error of feedforward control
 ///     turtle1/cmd_vel (geometry_msgs::Twist): Publish the control commands to move the turtle
@@ -27,15 +26,18 @@ class TurtleWay
 public:
     TurtleWay(ros::NodeHandle &nh)
     {
+        // define the publishers, subscriber
         pose_sub_ = nh.subscribe("turtle1/pose", 1000, &TurtleWay::callback_save_pose, this);
         vel_control_ = nh.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 60);
         error_pub_ = nh.advertise<tsim::PoseError>("pose_error", 60);
 
+        // read waypoints from the yaml file
         std::vector<double> waypoint_x;
         std::vector<double> waypoint_y;
         nh.getParam("/waypoint_x", waypoint_x);
         nh.getParam("/waypoint_y", waypoint_y);
 
+        // write the waypoints into vector
         for (int i = 0; i < waypoint_x.size(); i++)
         {
             rigid2d::Vector2D this_point(waypoint_x.at(i), waypoint_y.at(i));
@@ -46,6 +48,7 @@ public:
         // for (std::vector<rigid2d::Vector2D>::const_iterator i = waypoints_.begin(); i != waypoints_.end(); ++i)
         //     std::cout << *i << std::endl;
 
+        // initialize diffdrive starting at the first waypoint
         rigid2d::DiffDrive my_diff(rigid2d::Transform2D(rigid2d::Vector2D(waypoints_.at(0).x, waypoints_.at(0).y), 0), 0.4, 0.1);
         traj_generator = rigid2d::Waypoints(waypoints_, 60, my_diff);
 
@@ -57,11 +60,13 @@ public:
     /// \brief the callback function to save the actual pose
     void callback_save_pose(const turtlesim::Pose &msg)
     {
+        // save the actual pose from the turtle simulator
         actual_x_ = msg.x;
         actual_y_ = msg.y;
         actual_theta_ = msg.theta;
     }
 
+    /// \brief follow the trajectory with rotate and translate strategy
     void pipeline()
     {
         // lift the pen
@@ -79,7 +84,6 @@ public:
         }
 
         // teleport the turtle
-
         turtlesim::TeleportAbsolute teleport_absolute_req;
         teleport_absolute_req.request.x = waypoints_.at(0).x;
         teleport_absolute_req.request.y = waypoints_.at(0).y;
@@ -105,11 +109,13 @@ public:
             ROS_INFO("Put pen down");
         }
 
+        // wait for the turtle to teleport
         ros::Duration(1).sleep();
 
         ros::Rate rate(60);
         while (ros::ok())
         {
+            // get the next cmd_vel command
             rigid2d::Twist2D cmd = traj_generator.nextWaypoint();
             geometry_msgs::Twist twist_cmd;
             twist_cmd.linear.x = cmd.v_x;
@@ -121,6 +127,7 @@ public:
 
             tsim::PoseError error_msg;
 
+            // calculate error
             double target_x, target_y, target_theta;
             traj_generator.pose_belief(target_x, target_y, target_theta);
             error_msg.x_error = actual_x_ - target_x;

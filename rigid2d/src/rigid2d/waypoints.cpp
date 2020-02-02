@@ -28,10 +28,17 @@ Twist2D Waypoints::move_forward_cmd()
     return cmd;
 }
 
-Twist2D Waypoints::rotate_cmd()
+Twist2D Waypoints::rotate_l_cmd()
 {
     // can modify this to a porpotional controller
     Twist2D cmd(0.5, 0.0, 0.0);
+    return cmd;
+}
+
+Twist2D Waypoints::rotate_r_cmd()
+{
+    // can modify this to a porpotional controller
+    Twist2D cmd(-0.5, 0.0, 0.0);
     return cmd;
 }
 
@@ -41,9 +48,14 @@ Twist2D Waypoints::nextWaypoint()
     {
         return move_forward_cmd();
     }
+    else if (state_ == Rot_l)
+    {
+        return rotate_l_cmd();
+    }
+
     else
     {
-        return rotate_cmd();
+        return rotate_r_cmd();
     }
 }
 
@@ -83,14 +95,7 @@ int Waypoints::update_state()
         }
     }
 
-    if (if_right_direct(pose_x, pose_y, waypoints_[current_waypoint_num_].x, waypoints_[current_waypoint_num_].y, pose_theta))
-    {
-        state_ = Trans;
-    }
-    else
-    {
-        state_ = Rot;
-    }
+    state_ = if_right_direct(pose_x, pose_y, waypoints_[current_waypoint_num_].x, waypoints_[current_waypoint_num_].y, pose_theta);
 
     return 0;
 }
@@ -100,10 +105,21 @@ bool Waypoints::if_close(double pos_1_x, double pos_1_y, double pos_2_x, double 
     return std::sqrt(std::pow(pos_1_x - pos_2_x, 2) + std::pow(pos_1_y - pos_2_y, 2)) < 0.3;
 }
 
-bool Waypoints::if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta)
+CurrentState Waypoints::if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta)
 {
     double angle_diff = normalize_angle(std::atan2(pos_2_y - pos_1_y, pos_2_x - pos_1_x) - theta);
-    return angle_diff < 0.1 && -0.1 < angle_diff;
+    if (angle_diff < 0.1 && -0.1 < angle_diff)
+    {
+        return Trans;
+    }
+    else if (angle_diff > 0.1)
+    {
+        return Rot_l;
+    }
+    else
+    {
+        return Rot_r;
+    }
 }
 
 int Waypoints::pose_belief(double &x, double &y, double &theta)
