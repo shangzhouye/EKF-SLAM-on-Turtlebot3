@@ -24,6 +24,10 @@ The following figures illustrates the state machine coded in `src/turtle_rect.cp
 
 ## Demo
 
+Screenshot of the error for a full pentagon cycle:
+
+![turtle_rqt_plot](https://github.com/ME495-Navigation/main-assignment-shangzhouye/blob/master/figures/turtle_way_rqt_plot.png?raw=true "turtle_rqt_plot")
+
 Screenshot of the turtle:
 
 ![turtle](https://github.com/ME495-Navigation/main-assignment-shangzhouye/blob/master/figures/tsim_turtle.png?raw=true "turtle")
