@@ -1,0 +1,19 @@
+<!-- The launch file is used for launching Turtle Odometry -->
+
+<launch>
+
+    <include file="$(find tsim)/launch/turtle_pent.launch" />
+
+    <param name="robot_description" command="xacro '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'" />
+
+    <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true"/>
+
+    <node name="odometer" pkg="rigid2d" type="odometer" />
+
+    <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" />
+
+</launch>

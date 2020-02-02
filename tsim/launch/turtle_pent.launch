@@ -4,7 +4,9 @@
     <rosparam command="load" file="$(find tsim)/config/turtle_way.yaml" />
 
     <node name="turtle_way" pkg="tsim" type="turtle_way" output="screen" />
+    
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+
     <group if="$(eval arg('plot_gui') == true)">
         <node name="error_plot" pkg="rqt_plot" type="rqt_plot" args="pose_error/x_error pose_error/y_error pose_error/theta_error" />
     </group>
