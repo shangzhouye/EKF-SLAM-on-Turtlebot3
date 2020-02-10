@@ -1,0 +1,6 @@
+- git:
+    local-name: src/main-assignment-shangzhouye
+    uri: git@github.com:ME495-Navigation/main-assignment-shangzhouye.git
+- git:
+    local-name: src/nuturtlebot
+    uri: https://github.com/ME495-Navigation/nuturtlebot.git
