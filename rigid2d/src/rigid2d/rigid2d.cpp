@@ -9,6 +9,12 @@
 namespace rigid2d
 {
 
+double normalize_angle(double rad)
+{
+    double result = std::remainder(rad, 2.0 * PI);
+    return result;
+}
+
 std::ostream &operator<<(std::ostream &os, const Vector2D &v)
 {
     os << "[" << v.x << " " << v.y << "]" << std::endl;

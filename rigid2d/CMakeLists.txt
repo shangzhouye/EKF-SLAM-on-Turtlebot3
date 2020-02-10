@@ -138,11 +138,11 @@ include_directories(
 add_library(${PROJECT_NAME}_lib src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
 add_dependencies(${PROJECT_NAME}_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp)
-add_dependencies(diff_drive_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
+add_dependencies(diff_drive_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_lib)
 
-add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp)
-add_dependencies(waypoints_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp src/${PROJECT_NAME}/diff_drive.cpp src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
+add_dependencies(waypoints_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_lib diff_drive_lib)
 
 add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
