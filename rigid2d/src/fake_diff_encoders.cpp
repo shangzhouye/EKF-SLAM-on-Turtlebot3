@@ -36,8 +36,8 @@ public:
         joint_states_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);
 
         // set param here for testing
-        nh.setParam("/wheel_base", 0.4);
-        nh.setParam("/wheel_radius", 0.1);
+        // nh.setParam("/wheel_base", 0.4);
+        // nh.setParam("/wheel_radius", 0.1);
         nh.setParam("/left_wheel_joint", "left_wheel_axle");
         nh.setParam("/right_wheel_joint", "right_wheel_axle");
 
@@ -46,7 +46,7 @@ public:
         nh.getParam("/left_wheel_joint", left_wheel_joint_);
         nh.getParam("/right_wheel_joint", right_wheel_joint_);
 
-        my_robot_ = rigid2d::DiffDrive(rigid2d::Transform2D(rigid2d::Vector2D(0, 0), 0), wheel_base_, wheel_radius_);
+        my_robot_ = rigid2d::DiffDrive(rigid2d::Transform2D(), wheel_base_, wheel_radius_);
 
         current_l_ = 0;
         current_r_ = 0;

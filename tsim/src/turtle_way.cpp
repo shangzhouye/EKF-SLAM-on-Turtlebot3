@@ -37,6 +37,9 @@ public:
         nh.getParam("/waypoint_x", waypoint_x);
         nh.getParam("/waypoint_y", waypoint_y);
 
+        nh.getParam("/wheel_base", wheel_base_);
+        nh.getParam("/wheel_radius", wheel_radius_);
+
         // write the waypoints into vector
         for (int i = 0; i < waypoint_x.size(); i++)
         {
@@ -49,7 +52,7 @@ public:
         //     std::cout << *i << std::endl;
 
         // initialize diffdrive starting at the first waypoint
-        rigid2d::DiffDrive my_diff(rigid2d::Transform2D(rigid2d::Vector2D(waypoints_.at(0).x, waypoints_.at(0).y), 0), 0.4, 0.1);
+        rigid2d::DiffDrive my_diff(rigid2d::Transform2D(rigid2d::Vector2D(waypoints_.at(0).x, waypoints_.at(0).y), 0), wheel_base_, wheel_radius_);
         traj_generator = rigid2d::Waypoints(waypoints_, 60, my_diff);
 
         set_pen_client_ = nh.serviceClient<turtlesim::SetPen>("turtle1/set_pen");
@@ -152,6 +155,9 @@ private:
     rigid2d::Waypoints traj_generator;
     ros::ServiceClient set_pen_client_;
     ros::ServiceClient teleport_turtle_client_;
+
+    double wheel_base_;
+    double wheel_radius_;
 };
 
 int main(int argc, char **argv)

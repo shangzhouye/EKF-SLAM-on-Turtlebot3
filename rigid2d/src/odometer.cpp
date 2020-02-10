@@ -61,8 +61,8 @@ public:
         joint_state_sub_ = nh.subscribe("/joint_states", 1000, &Odometer::joint_states_callback, this);
 
         // set param here for testing
-        nh.setParam("/wheel_base", 0.4);
-        nh.setParam("/wheel_radius", 0.1);
+        // nh.setParam("/wheel_base", 0.4);
+        // nh.setParam("/wheel_radius", 0.1);
         nh.setParam("/left_wheel_joint", "left_wheel_axle");
         nh.setParam("/right_wheel_joint", "right_wheel_axle");
         body_frame_id_ = "base_link";
@@ -73,7 +73,7 @@ public:
         nh.getParam("/left_wheel_joint", left_wheel_joint_);
         nh.getParam("/right_wheel_joint", right_wheel_joint_);
 
-        my_robot_ = rigid2d::DiffDrive();
+        my_robot_ = rigid2d::DiffDrive(rigid2d::Transform2D(), wheel_base_, wheel_radius_);
 
         last_l_ = 0;
         last_r_ = 0;

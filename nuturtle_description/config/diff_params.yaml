@@ -2,9 +2,19 @@
 chassis_length: 0.138
 # The distance between the centers wheels
 wheel_base: 0.160
-#  The thickness of the plate that forms the chassis
+# The thickness of the plate that forms the chassis
 chassis_thickness: 0.048
 # The radius of the wheels
 wheel_radius: 0.033
 # The width of the wheels
 wheel_width: 0.018
+# The number of encoder ticks per revolution of the wheels
+encoder_ticks_per_rev: 4096
+# Maximum translational velocity
+max_trans_vel: 0.22
+# Maximum rotational velocity
+max_rot_vel: 2.84
+# Maximum motor velocity
+max_mot_vel: 6.35492
+# Maximum motor power
+max_mot_pow: 885
