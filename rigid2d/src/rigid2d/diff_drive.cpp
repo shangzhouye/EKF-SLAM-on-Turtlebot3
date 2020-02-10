@@ -58,8 +58,12 @@ Transform2D DiffDrive::get_pose()
 
 void DiffDrive::reset(Twist2D ps)
 {
-    Transform2D reset_pose;
-    reset_pose = integrateTwist(ps);
+    // Intergrate twist or set the position and orientation?
+    // Transform2D reset_pose;
+    // reset_pose = integrateTwist(ps);
+    // pose_ = reset_pose;
+
+    Transform2D reset_pose(Vector2D(ps.v_x, ps.v_y), ps.omega);
     pose_ = reset_pose;
 }
 

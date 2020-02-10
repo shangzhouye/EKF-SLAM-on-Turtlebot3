@@ -18,7 +18,6 @@
 /// SUBSCRIBES:
 ///     joint_states (sensor_msgs/JointState): the joint states of l/r wheels
 
-
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "ros/ros.h"
@@ -31,6 +30,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/TransformStamped.h"
+#include "rigid2d/SetPose.h"
 
 class Odometer
 {
@@ -53,6 +53,8 @@ private:
     double current_r_;
 
     ros::Time last_time_now_;
+
+    ros::ServiceServer set_pose;
 
 public:
     Odometer(ros::NodeHandle &nh)
@@ -78,6 +80,23 @@ public:
         last_l_ = 0;
         last_r_ = 0;
         last_time_now_ = ros::Time::now();
+
+        set_pose = nh.advertiseService("/set_pose", &Odometer::callback_set_pose, this);
+    }
+
+    /// \brief set the pose to a given position and orientation
+    bool callback_set_pose(rigid2d::SetPose::Request &req,
+                           rigid2d::SetPose::Response &res)
+    {
+        double x, y, theta;
+        x = req.x;
+        y = req.y;
+        theta = req.theta;
+
+        rigid2d::Twist2D pose_reset(theta, x, y);
+        my_robot_.reset(pose_reset);
+
+        return true;
     }
 
     /// \brief read messages from joint states publisher (encoder), publish current pose and velocity, broadcast to tf
@@ -114,7 +133,7 @@ public:
         ros::Time current_time_now = ros::Time::now();
         double vel_diff_l = current_l_ - last_l_;
         double vel_diff_r = current_r_ - last_r_;
-        
+
         vel_diff_l = rigid2d::normalize_angle(vel_diff_l);
         vel_diff_r = rigid2d::normalize_angle(vel_diff_r);
 
