@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rigid2d)
+project(nuturtle_robot)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,9 +9,7 @@ project(rigid2d)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  tf2_ros
-  message_generation
-  std_msgs
+  rospy
 )
 
 ## System dependencies are found with CMake's conventions
@@ -26,8 +24,6 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
-# Learned: for building a srv file, std_msgs should be in the list of MSG_DEP_SET
 
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
@@ -57,12 +53,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   FILES
-   SetPose.srv
+# add_service_files(
+#   FILES
 #   Service1.srv
 #   Service2.srv
- )
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,10 +67,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,8 +103,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES rigid2d
-  CATKIN_DEPENDS roscpp message_runtime std_msgs
+#  LIBRARIES nuturtle_robot
+#  CATKIN_DEPENDS roscpp rospy
 #  DEPENDS system_lib
 )
 
@@ -122,12 +117,11 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-  "include/"
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/rigid2d.cpp
+#   src/${PROJECT_NAME}/nuturtle_robot.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -138,48 +132,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/rigid2d_node.cpp)
-
-add_library(${PROJECT_NAME}_lib src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
-add_dependencies(${PROJECT_NAME}_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-add_library(diff_drive_lib src/${PROJECT_NAME}/diff_drive.cpp src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
-add_dependencies(diff_drive_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_lib)
-
-add_library(waypoints_lib src/${PROJECT_NAME}/waypoints.cpp src/${PROJECT_NAME}/diff_drive.cpp src/${PROJECT_NAME}/${PROJECT_NAME}.cpp)
-add_dependencies(waypoints_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_lib diff_drive_lib)
-
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
-set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
-
-add_executable(${PROJECT_NAME}_odometer src/odometer.cpp)
-set_target_properties(${PROJECT_NAME}_odometer PROPERTIES OUTPUT_NAME odometer PREFIX "")
-add_dependencies(${PROJECT_NAME}_odometer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_odometer ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
-
-add_executable(${PROJECT_NAME}_fake_diff_encoders src/fake_diff_encoders.cpp)
-set_target_properties(${PROJECT_NAME}_fake_diff_encoders PROPERTIES OUTPUT_NAME fake_diff_encoders PREFIX "")
-add_dependencies(${PROJECT_NAME}_fake_diff_encoders ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_fake_diff_encoders ${catkin_LIBRARIES} ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib)
-
-install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_odometer ${PROJECT_NAME}_fake_diff_encoders
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(TARGETS ${PROJECT_NAME}_lib diff_drive_lib waypoints_lib
-ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
+# add_executable(${PROJECT_NAME}_node src/nuturtle_robot_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -238,36 +191,17 @@ install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
+install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_rigid2d.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_nuturtle_robot.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
-# add compile settings
-add_compile_options(-Wall -Werror)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# add gtest
-if (CATKIN_ENABLE_TESTING)
-    # to avoid "undefined reference to `pthread_getspecific'" error
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    catkin_add_gtest(${PROJECT_NAME}_test test/${PROJECT_NAME}_test.cpp)
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib)
-
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    catkin_add_gtest(diff_drive_test test/diff_drive_test.cpp)
-    target_link_libraries(diff_drive_test ${catkin_Libraries} gtest_main ${PROJECT_NAME}_lib diff_drive_lib)
-endif()
-
-# use clang as the compiler
-# set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-# set(CMAKE_C_COMPILER "/usr/bin/clang")

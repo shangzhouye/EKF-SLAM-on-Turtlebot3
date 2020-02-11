@@ -139,7 +139,10 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/tsim_node.cpp)
 
+# Learned: remember to add dependencies for generating msg, srv files
+
 add_executable(turtle_rect src/turtle_rect.cpp)
+add_dependencies(turtle_rect ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(turtle_rect ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_turtle_way src/turtle_way.cpp)
@@ -152,6 +155,8 @@ install(TARGETS turtle_rect ${PROJECT_NAME}_turtle_way
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
