@@ -56,6 +56,9 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
 
+  <build_depend>nuturtlebot</build_depend>
+
+  <test_depend>rostest</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -252,7 +252,7 @@ install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 # catkin_add_nosetests(test)
 
 # add compile settings
-add_compile_options(-Wall -Werror)
+add_compile_options(-Wall -Wextra)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 

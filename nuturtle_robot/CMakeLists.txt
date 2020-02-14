@@ -10,7 +10,12 @@ project(nuturtle_robot)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  nuturtlebot
 )
+
+if (CATKIN_ENABLE_TESTING)
+   find_package(rostest REQUIRED)
+endif()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -117,7 +122,18 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  "../rigid2d/include/"
 )
+
+add_executable(turtle_interface_node src/turtle_interface.cpp)
+set_target_properties(turtle_interface_node PROPERTIES OUTPUT_NAME turtle_interface PREFIX "")
+add_dependencies(turtle_interface_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(turtle_interface_node ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+
+if (CATKIN_ENABLE_TESTING)
+    add_rostest_gtest(turtle_interface_test test/turtle_interface_test.test test/turtle_interface_test.cpp)
+    target_link_libraries(turtle_interface_test ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+endif()
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -192,6 +208,11 @@ include_directories(
 # )
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
+# add compile settings
+add_compile_options(-Wall -Wextra)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 #############
 ## Testing ##
