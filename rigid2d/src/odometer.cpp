@@ -17,6 +17,8 @@
 ///     nav_odo (nav_msgs/Odometry): publish current robot pose
 /// SUBSCRIBES:
 ///     joint_states (sensor_msgs/JointState): the joint states of l/r wheels
+/// SERVICES:
+///     set_pose (rigid2d/SetPose): set the pose of the odometry
 
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
@@ -59,8 +61,8 @@ private:
 public:
     Odometer(ros::NodeHandle &nh)
     {
-        nav_odo_pub_ = nh.advertise<nav_msgs::Odometry>("/nav_odo", 10);
-        joint_state_sub_ = nh.subscribe("/joint_states", 1000, &Odometer::joint_states_callback, this);
+        nav_odo_pub_ = nh.advertise<nav_msgs::Odometry>("nav_odo", 10);
+        joint_state_sub_ = nh.subscribe("joint_states", 1000, &Odometer::joint_states_callback, this);
 
         // set param here for testing
         // nh.setParam("/wheel_base", 0.4);
@@ -81,7 +83,7 @@ public:
         last_r_ = 0;
         last_time_now_ = ros::Time::now();
 
-        set_pose = nh.advertiseService("/set_pose", &Odometer::callback_set_pose, this);
+        set_pose = nh.advertiseService("set_pose", &Odometer::callback_set_pose, this);
     }
 
     /// \brief set the pose to a given position and orientation

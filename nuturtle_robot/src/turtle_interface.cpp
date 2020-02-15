@@ -2,7 +2,7 @@
 /// \brief Node for the turtle interface:  low-level control and odometry routines
 ///
 /// PUBLISHES:
-///     joint_states (sensor_msgs/JointState): publish joint states from sensor data
+///     joint_state (sensor_msgs/JointState): publish joint states from sensor data
 ///     wheel_cmd (nuturtlebot/WheelCommands): publish wheel command to move the robot
 /// SUBSCRIBES:
 ///     turtle1/cmd_vel (geometry_msgs/Twist): subscribe to current cmd_vel commands
@@ -20,7 +20,7 @@
 #include "sensor_msgs/JointState.h"
 #include <vector>
 
-constexpr double PI = 3.14159265358979323846;
+static constexpr double PI = 3.14159265358979323846;
 
 class TurtleInterface
 {
@@ -31,7 +31,7 @@ public:
 
         sensor_data_sub_ = nh.subscribe("sensor_data", 1000, &TurtleInterface::sensor_data_callback, this);
 
-        wheel_cmd_pub_ = nh.advertise<nuturtlebot::WheelCommands>("/wheel_cmd", 10);
+        wheel_cmd_pub_ = nh.advertise<nuturtlebot::WheelCommands>("wheel_cmd", 10);
 
         joint_state_pub_ = nh.advertise<sensor_msgs::JointState>("joint_state", 10);
 

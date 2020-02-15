@@ -1,0 +1,13 @@
+<launch>
+
+    <arg name="robot" default='0' doc="The robot to use."/>
+    <include file="$(find nuturtle_robot)/launch/basic_remote.launch">
+        <arg name="robot" value="$(arg robot)" />
+    </include>
+
+    <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+    
+    <node machine="turtlebot" pkg="nuturtle_robot" type="rotation" name="rotation" />
+    <node machine="turtlebot" pkg="nuturtle_robot" type="turtle_interface" name="turtle_interface" />
+
+</launch>

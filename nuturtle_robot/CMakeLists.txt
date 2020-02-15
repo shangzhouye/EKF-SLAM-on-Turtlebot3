@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   nuturtlebot
+  message_generation
+  std_msgs
 )
 
 if (CATKIN_ENABLE_TESTING)
@@ -58,11 +60,12 @@ endif()
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
+ add_service_files(
+   FILES
+   Start.srv
 #   Service1.srv
 #   Service2.srv
-# )
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,10 +75,10 @@ endif()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs  # Or other packages containing msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -109,7 +112,7 @@ endif()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_robot
-#  CATKIN_DEPENDS roscpp rospy
+  CATKIN_DEPENDS roscpp rospy message_runtime std_msgs
 #  DEPENDS system_lib
 )
 
@@ -125,10 +128,13 @@ include_directories(
   "../rigid2d/include/"
 )
 
-add_executable(turtle_interface_node src/turtle_interface.cpp)
-set_target_properties(turtle_interface_node PROPERTIES OUTPUT_NAME turtle_interface PREFIX "")
-add_dependencies(turtle_interface_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(turtle_interface_node ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+add_executable(turtle_interface src/turtle_interface.cpp)
+add_dependencies(turtle_interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(turtle_interface ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+
+add_executable(rotation src/rotation.cpp)
+add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rotation ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
 
 if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(turtle_interface_test test/turtle_interface_test.test test/turtle_interface_test.cpp)
@@ -208,6 +214,10 @@ endif()
 # )
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
+install(TARGETS turtle_interface rotation
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 # add compile settings
 add_compile_options(-Wall -Wextra)

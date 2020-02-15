@@ -179,7 +179,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

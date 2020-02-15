@@ -33,7 +33,7 @@ public:
     FakeDiffEncoder(ros::NodeHandle &nh)
     {
         cmd_vel_sub_ = nh.subscribe("turtle1/cmd_vel", 1000, &FakeDiffEncoder::cmd_vel_callback, this);
-        joint_states_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);
+        joint_states_pub_ = nh.advertise<sensor_msgs::JointState>("joint_states", 10);
 
         // set param here for testing
         // nh.setParam("/wheel_base", 0.4);
