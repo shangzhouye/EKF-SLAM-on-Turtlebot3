@@ -17,7 +17,10 @@
 
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
 
-    <node name="odometer" pkg="rigid2d" type="odometer" />
+    <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
+        <param name="~body_frame_id_" type="str" value="base_link" />
+        <param name="~odom_frame_id_" type="str" value="odom" />
+    </node>
 
     <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" />
 

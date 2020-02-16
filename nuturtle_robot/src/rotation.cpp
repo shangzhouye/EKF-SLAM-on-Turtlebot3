@@ -2,11 +2,10 @@
 /// \brief Node for rotating the turtlebot in place
 ///
 /// PUBLISHES:
-///     joint_states (sensor_msgs/JointState): publish joint states from sensor data
-///     wheel_cmd (nuturtlebot/WheelCommands): publish wheel command to move the robot
-/// SUBSCRIBES:
-///     turtle1/cmd_vel (geometry_msgs/Twist): subscribe to current cmd_vel commands
-///     sensor_data (nuturtlebot/SensorData): subscribe to the sensor (encoder) data
+///     turtle1/cmd_vel (geometry_msgs/Twist): publish twist command on cmd_vel
+/// SERVICES:
+///     start (nuturtle_robot/Start): service to start the rotation
+
 
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>

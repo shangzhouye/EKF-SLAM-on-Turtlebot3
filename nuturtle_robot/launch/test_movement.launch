@@ -8,6 +8,9 @@
     <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
     
     <node machine="turtlebot" pkg="nuturtle_robot" type="rotation" name="rotation" />
+
+    <!-- Turtlebot encoder branch -->
+
     <node machine="turtlebot" pkg="nuturtle_robot" type="turtle_interface" name="turtle_interface" />
 
 
@@ -19,6 +22,25 @@
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true"/>
 
-    <node machine="turtlebot" name="odometer" pkg="rigid2d" type="odometer" />
+    <node machine="turtlebot" name="odometer" pkg="rigid2d" type="odometer" output="screen">
+        <param name="~body_frame_id_" type="str" value="base_link" />
+        <param name="~odom_frame_id_" type="str" value="odom" />
+    </node>
+
+
+    <!-- Fake encoder branch -->
+
+    <node machine="turtlebot" name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" >
+        <remap from="joint_states" to="fake/joint_states"/>
+    </node>
+
+    <node machine="turtlebot" name="fake_odometer" pkg="rigid2d" type="odometer" output="screen">
+        <remap from="joint_state" to="fake/joint_states"/>
+        <remap from="nav_odo" to="fake/nav_odo"/>
+        <param name="~body_frame_id_" type="str" value="fake_base_link" />
+        <param name="~odom_frame_id_" type="str" value="fake_odom" />
+    </node>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="odom_to_fake_odom_broadcaster" args="0 0 0 0 0 0 1 odom fake_odom" />
 
 </launch>

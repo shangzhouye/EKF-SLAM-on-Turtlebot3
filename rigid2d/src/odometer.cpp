@@ -67,8 +67,14 @@ public:
         // set param here for testing
         // nh.setParam("/wheel_base", 0.4);
         // nh.setParam("/wheel_radius", 0.1);
-        body_frame_id_ = "base_link";
-        odom_frame_id_ = "odom";
+        // body_frame_id_ = "base_link";
+        // odom_frame_id_ = "odom";
+
+        // nh.getParam("~body_frame_id_", body_frame_id_);
+        // nh.getParam("~odom_frame_id_", odom_frame_id_);
+
+        ros::param::get("~body_frame_id_", body_frame_id_);
+        ros::param::get("~odom_frame_id_", odom_frame_id_);
 
         nh.getParam("/wheel_base", wheel_base_);
         nh.getParam("/wheel_radius", wheel_radius_);
