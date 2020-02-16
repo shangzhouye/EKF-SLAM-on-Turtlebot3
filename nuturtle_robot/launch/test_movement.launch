@@ -10,4 +10,15 @@
     <node machine="turtlebot" pkg="nuturtle_robot" type="rotation" name="rotation" />
     <node machine="turtlebot" pkg="nuturtle_robot" type="turtle_interface" name="turtle_interface" />
 
+
+    <param name="robot_description" command="xacro '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="joint_states" to="joint_state"/>
+    </node>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true"/>
+
+    <node machine="turtlebot" name="odometer" pkg="rigid2d" type="odometer" />
+
 </launch>

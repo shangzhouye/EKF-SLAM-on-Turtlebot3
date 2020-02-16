@@ -1,0 +1,8 @@
+<launch>
+
+    <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+    
+    <node pkg="nuturtle_robot" type="rotation" name="rotation" />
+    <node pkg="nuturtle_robot" type="turtle_interface" name="turtle_interface" />
+
+</launch>

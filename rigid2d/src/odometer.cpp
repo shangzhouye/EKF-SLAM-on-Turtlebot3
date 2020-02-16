@@ -16,7 +16,7 @@
 /// PUBLISHES:
 ///     nav_odo (nav_msgs/Odometry): publish current robot pose
 /// SUBSCRIBES:
-///     joint_states (sensor_msgs/JointState): the joint states of l/r wheels
+///     joint_state (sensor_msgs/JointState): the joint states of l/r wheels
 /// SERVICES:
 ///     set_pose (rigid2d/SetPose): set the pose of the odometry
 
@@ -62,13 +62,11 @@ public:
     Odometer(ros::NodeHandle &nh)
     {
         nav_odo_pub_ = nh.advertise<nav_msgs::Odometry>("nav_odo", 10);
-        joint_state_sub_ = nh.subscribe("joint_states", 1000, &Odometer::joint_states_callback, this);
+        joint_state_sub_ = nh.subscribe("joint_state", 1000, &Odometer::joint_states_callback, this);
 
         // set param here for testing
         // nh.setParam("/wheel_base", 0.4);
         // nh.setParam("/wheel_radius", 0.1);
-        nh.setParam("/left_wheel_joint", "left_wheel_axle");
-        nh.setParam("/right_wheel_joint", "right_wheel_axle");
         body_frame_id_ = "base_link";
         odom_frame_id_ = "odom";
 
