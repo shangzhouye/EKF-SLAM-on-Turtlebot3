@@ -40,7 +40,7 @@ void DiffDrive::updateOdometry(double left, double right)
     wheel_v.v_right = right;
     Twist2D twist = wheelsToTwist(wheel_v);
     Transform2D transformation = integrateTwist(twist);
-    std::cout << "Debug - Transformation is: " << transformation << std::endl;
+    // std::cout << "Debug - Transformation is: " << transformation << std::endl;
     pose_ *= transformation;
 }
 

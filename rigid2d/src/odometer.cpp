@@ -54,6 +54,8 @@ private:
     double current_l_;
     double current_r_;
 
+    bool if_init_;
+
     ros::Time last_time_now_;
 
     ros::ServiceServer set_pose;
@@ -88,6 +90,8 @@ public:
         last_time_now_ = ros::Time::now();
 
         set_pose = nh.advertiseService("set_pose", &Odometer::callback_set_pose, this);
+
+        if_init_ = false;
     }
 
     /// \brief set the pose to a given position and orientation
@@ -108,6 +112,13 @@ public:
     /// \brief read messages from joint states publisher (encoder), publish current pose and velocity, broadcast to tf
     void joint_states_callback(const sensor_msgs::JointState msg)
     {
+        if (!if_init_)
+        {
+            last_l_ = msg.position.at(1);
+            last_r_ = msg.position.at(0);
+            if_init_ = true;
+        }
+
         current_l_ = msg.position.at(1);
         current_r_ = msg.position.at(0);
 
@@ -146,8 +157,8 @@ public:
         double vel_l = (vel_diff_l) / (current_time_now - last_time_now_).toSec();
         double vel_r = (vel_diff_r) / (current_time_now - last_time_now_).toSec();
 
-        std::cout << "Time difference: " << (current_time_now - last_time_now_).toSec() << std::endl;
-        std::cout << "Wheel Velocities: " << vel_l << " and " << vel_r << std::endl;
+        // std::cout << "Time difference: " << (current_time_now - last_time_now_).toSec() << std::endl;
+        // std::cout << "Wheel Velocities: " << vel_l << " and " << vel_r << std::endl;
 
         rigid2d::WheelVelocities wheel_vel;
         wheel_vel.v_left = vel_l;

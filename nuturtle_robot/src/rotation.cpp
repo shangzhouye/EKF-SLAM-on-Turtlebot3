@@ -79,7 +79,7 @@ public:
 
         int pub_times = (2 * PI) / (twist.angular.z * (1.0 / static_cast<double>(freq_)));
 
-        for (int k = 0; k < 2; k++)
+        for (int k = 0; k < 20; k++)
         {
             for (int i = 0; i < pub_times; i++)
             {
