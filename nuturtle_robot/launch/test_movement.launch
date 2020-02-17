@@ -7,7 +7,7 @@
 
     <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
     
-    <node machine="turtlebot" pkg="nuturtle_robot" type="rotation" name="rotation" />
+    <node machine="turtlebot" pkg="nuturtle_robot" type="rotation" name="rotation"  output="screen"/>
 
     <!-- Turtlebot encoder branch -->
 

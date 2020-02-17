@@ -6,7 +6,6 @@
 /// SERVICES:
 ///     start (nuturtle_robot/Start): service to start the rotation
 
-
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "ros/ros.h"
@@ -21,6 +20,7 @@
 #include "nuturtle_robot/Start.h"
 #include "rigid2d/SetPose.h"
 #include "geometry_msgs/Twist.h"
+#include <cstdlib>
 
 static constexpr double PI = 3.14159265358979323846;
 
@@ -44,7 +44,7 @@ public:
 
         cmd_vel_pub_ = nh.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 10);
 
-        frac_vel_ = 0.5;
+        frac_vel_ = 1;
 
         freq_ = 110;
     }
@@ -77,7 +77,7 @@ public:
         twist.linear.x = 0;
         twist.angular.z = if_clockwise * frac_vel_ * 2.84;
 
-        int pub_times = (2 * PI) / (twist.angular.z * (1.0 / static_cast<double>(freq_)));
+        int pub_times = abs((2 * PI) / (twist.angular.z * (1.0 / static_cast<double>(freq_))));
 
         for (int k = 0; k < 20; k++)
         {

@@ -73,14 +73,14 @@ public:
         wheel_cmd = my_robot_.twistToWheels(twist_cmd);
 
         // transfer to command integer
-        if (wheel_cmd.v_left > max_mot_vel_)
+        if ((wheel_cmd.v_left > max_mot_vel_) || (wheel_cmd.v_left < -max_mot_vel_))
         {
-            wheel_cmd.v_left = max_mot_vel_;
+            wheel_cmd.v_left = (wheel_cmd.v_left / abs(wheel_cmd.v_left)) * max_mot_vel_;
         }
 
-        if (wheel_cmd.v_right > max_mot_vel_)
+        if ((wheel_cmd.v_right > max_mot_vel_) || (wheel_cmd.v_right < -max_mot_vel_))
         {
-            wheel_cmd.v_right = max_mot_vel_;
+            wheel_cmd.v_right = (wheel_cmd.v_right / abs(wheel_cmd.v_right)) * max_mot_vel_;
         }
 
         wheel_cmd.v_left = (wheel_cmd.v_left) / max_mot_vel_ * 256;
