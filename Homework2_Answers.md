@@ -17,3 +17,15 @@
 
 - 6. Yes. The forward model does not take the dynamcis of the robot into account. The robot is not able to achieve the target speed immediately. Using the encoders eliminated the difference between the velocity command and how much the wheel actually rotated.
 - 7. Yes.
+
+## F.009
+
+- [Visualization in Rviz](https://www.google.com)
+- [Running in real world](https://www.google.com)
+
+- FV: 0.7	
+- linear velocity = 0.1540
+- angular velocity = 1.9880
+- total_distance =  6.828 m
+- x_error = 0.49 m
+- y_error = 0.02m							

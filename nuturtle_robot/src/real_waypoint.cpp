@@ -27,6 +27,7 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Quaternion.h"
 #include "tf/transform_datatypes.h"
+#include <visualization_msgs/Marker.h>
 
 static constexpr double PI = 3.14159265358979323846;
 
@@ -72,6 +73,8 @@ public:
         traj_generator = rigid2d::Waypoints(waypoints_, 110, my_diff);
 
         if_stop_ = false;
+
+        marker_pub_ = nh.advertise<visualization_msgs::Marker>("visualization_marker", 1, true);
     }
 
     bool stop_callback(nuturtle_robot::Stop::Request &req,
@@ -108,6 +111,13 @@ public:
                                  nuturtle_robot::StartWaypoint::Response &res)
     {
         ros::Rate rate(freq_);
+        
+        // publish the markers
+        for (int i = 0; i < waypoints_.size(); i++)
+        {
+            publish_waypoint_marker(waypoints_.at(i).x, waypoints_.at(i).y, i);
+        }
+
         while (ros::ok())
         {
             if (traj_generator.current_waypoint_num_ == waypoints_.size())
@@ -155,6 +165,46 @@ public:
         return 0;
     }
 
+    int publish_waypoint_marker(double x, double y, int marker_id)
+    {
+        visualization_msgs::Marker marker;
+        marker.header.frame_id = "/odom";
+        marker.header.stamp = ros::Time::now();
+
+        marker.ns = "markers";
+        marker.id = marker_id;
+
+        uint32_t shape = visualization_msgs::Marker::CYLINDER;
+        marker.type = shape;
+
+        marker.action = visualization_msgs::Marker::ADD;
+
+        marker.pose.position.x = x;
+        marker.pose.position.y = y;
+        marker.pose.position.z = 0;
+        marker.pose.orientation.x = 0.0;
+        marker.pose.orientation.y = 0.0;
+        marker.pose.orientation.z = 0.0;
+        marker.pose.orientation.w = 1.0;
+
+        marker.scale.x = 0.3;
+        marker.scale.y = 0.3;
+        marker.scale.z = 0.3;
+
+        marker.color.r = 0.0f;
+        marker.color.g = 1.0f;
+        marker.color.b = 0.0f;
+        marker.color.a = 1.0;
+
+        marker.lifetime = ros::Duration();
+
+        // Publish the marker
+        marker_pub_.publish(marker);
+        ros::spinOnce();
+
+        return 0;
+    }
+
 private:
     double max_trans_vel_;
     double max_rot_vel_;
@@ -179,6 +229,8 @@ private:
     rigid2d::Waypoints traj_generator;
 
     bool if_stop_;
+
+    ros::Publisher marker_pub_;
 };
 
 int main(int argc, char **argv)

@@ -119,18 +119,25 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          caster1:
-            {}
-          caster2:
-            {}
-          left_wheel:
-            {}
-          right_wheel:
-            {}
         odom:
-          {}
+          base_link:
+            caster1:
+              {}
+            caster2:
+              {}
+            left_wheel:
+              {}
+            right_wheel:
+              {}
       Update Interval: 0
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: visualization_marker
+      Name: Marker
+      Namespaces:
+        markers: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -160,16 +167,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 15.650177955627441
+      Distance: 7.060194969177246
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.061900828033685684
-        Y: 0.02388901822268963
-        Z: 0.06863382458686829
+        X: 0.6016730070114136
+        Y: 0.6668025255203247
+        Z: 0.1763734072446823
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   tf
+  visualization_msgs
 )
 
 if (CATKIN_ENABLE_TESTING)
@@ -115,7 +116,7 @@ endif()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_robot
-  CATKIN_DEPENDS roscpp rospy message_runtime std_msgs
+  CATKIN_DEPENDS roscpp rospy message_runtime std_msgs visualization_msgs
 #  DEPENDS system_lib
 )
 
