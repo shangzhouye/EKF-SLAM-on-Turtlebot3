@@ -9,7 +9,7 @@
 
     <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
 
     <group if="$(eval arg('use_jsp_gui') == true)">
         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -17,7 +17,7 @@
         </node>
     </group>
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_robot.rviz" required="true"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_robot.rviz" required="true" output="screen"/>
 
 
 </launch>

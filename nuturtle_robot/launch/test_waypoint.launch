@@ -5,12 +5,12 @@
 
     <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
         <remap from="joint_states" to="joint_state"/>
     </node>
 
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true" output="screen"/>
 
     <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
         <param name="~body_frame_id_" type="str" value="base_link" />

@@ -14,6 +14,15 @@
 <!-- Define caster 'radius' - the length of the cylinder -->
 <xacro:property name="caster_radius" value="${radius - dimension['chassis_thickness']/2}" />
 
+<!-- add a dummy link for KDL -->
+<link name="dummy">
+</link>
+
+<joint name="dummy_joint" type="fixed">
+    <parent link="dummy"/>
+    <child link="base_link"/>
+</joint>
+
 <!-- base_link -->
 <link name="base_link">
     <inertial>
