@@ -3,6 +3,7 @@
 ///
 /// PUBLISHES:
 ///     turtle1/cmd_vel (geometry_msgs/Twist): publish twist command on cmd_vel
+///     visualization_marker (visualization_msgs/Marker): publish markers at waypoints
 /// SERVICES:
 ///     stop (nuturtle_robot/Stop): stop the robot motion
 ///     start_waypoint (nuturtle_robot/StartWaypoint): start following the waypoint

@@ -20,8 +20,8 @@
 
 ## F.009
 
-- [Visualization in Rviz](https://www.google.com)
-- [Running in real world](https://www.google.com)
+- [Visualization in Rviz](https://github.com/ME495-Navigation/main-assignment-shangzhouye/raw/master/figures/nuturtle_rviz.mkv)
+- [Running in real world](https://github.com/ME495-Navigation/main-assignment-shangzhouye/raw/master/figures/nuturtle_real_world.mov)
 
 - FV: 0.7	
 - linear velocity = 0.1540
