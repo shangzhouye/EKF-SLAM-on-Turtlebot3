@@ -44,7 +44,7 @@ public:
 
         cmd_vel_pub_ = nh.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 10);
 
-        frac_vel_ = 1;
+        frac_vel_ = 0.7;
 
         freq_ = 110;
     }
@@ -52,58 +52,116 @@ public:
     bool start_callback(nuturtle_robot::Start::Request &req,
                         nuturtle_robot::Start::Response &res)
     {
-        int if_clockwise = req.if_clockwise;
-        if (if_clockwise)
+        if (req.if_rotation)
         {
-            if_clockwise = -1;
+            int if_clockwise = req.if_clockwise;
+            if (if_clockwise)
+            {
+                if_clockwise = -1;
+            }
+            else
+            {
+                if_clockwise = 1;
+            }
+
+            // reset the odometry
+
+            rigid2d::SetPose set_pose_req;
+            set_pose_req.request.x = 0;
+            set_pose_req.request.y = 0;
+            set_pose_req.request.theta = 0;
+            set_pose_client_.call(set_pose_req);
+
+            // pause after full rotation
+            ros::Rate rate(freq_);
+
+            geometry_msgs::Twist twist;
+            twist.linear.x = 0;
+            twist.angular.z = if_clockwise * frac_vel_ * max_rot_vel_;
+
+            int pub_times = abs((2 * PI) / (twist.angular.z * (1.0 / static_cast<double>(freq_))));
+
+            for (int k = 0; k < 20; k++)
+            {
+                for (int i = 0; i < pub_times; i++)
+                {
+                    twist.linear.x = 0;
+                    twist.angular.z = if_clockwise * frac_vel_ * max_rot_vel_;
+                    cmd_vel_pub_.publish(twist);
+                    ros::spinOnce();
+                    rate.sleep();
+                }
+                for (int j = 0; j < (pub_times / 20.0); j++)
+                {
+                    twist.linear.x = 0;
+                    twist.angular.z = 0;
+                    cmd_vel_pub_.publish(twist);
+                    ros::spinOnce();
+                    rate.sleep();
+                }
+                ros::spinOnce();
+            }
+
+            // stop the motor
+            twist.linear.x = 0;
+            twist.angular.z = 0;
+            cmd_vel_pub_.publish(twist);
         }
         else
         {
-            if_clockwise = 1;
-        }
-
-        // reset the odometry
-
-        rigid2d::SetPose set_pose_req;
-        set_pose_req.request.x = 0;
-        set_pose_req.request.y = 0;
-        set_pose_req.request.theta = 0;
-        set_pose_client_.call(set_pose_req);
-
-        // pause after full rotation
-        ros::Rate rate(freq_);
-
-        geometry_msgs::Twist twist;
-        twist.linear.x = 0;
-        twist.angular.z = if_clockwise * frac_vel_ * 2.84;
-
-        int pub_times = abs((2 * PI) / (twist.angular.z * (1.0 / static_cast<double>(freq_))));
-
-        for (int k = 0; k < 20; k++)
-        {
-            for (int i = 0; i < pub_times; i++)
+            int if_forward = req.if_forward;
+            if (if_forward)
             {
-                twist.linear.x = 0;
-                twist.angular.z = if_clockwise * frac_vel_ * 2.84;
-                cmd_vel_pub_.publish(twist);
-                ros::spinOnce();
-                rate.sleep();
+                if_forward = 1;
             }
-            for (int j = 0; j < (pub_times / 20.0); j++)
+            else
             {
-                twist.linear.x = 0;
-                twist.angular.z = 0;
-                cmd_vel_pub_.publish(twist);
-                ros::spinOnce();
-                rate.sleep();
+                if_forward = -1;
             }
-            ros::spinOnce();
-        }
 
-        // stop the motor
-        twist.linear.x = 0;
-        twist.angular.z = 0;
-        cmd_vel_pub_.publish(twist);
+            // reset the odometry
+
+            rigid2d::SetPose set_pose_req;
+            set_pose_req.request.x = 0;
+            set_pose_req.request.y = 0;
+            set_pose_req.request.theta = 0;
+            set_pose_client_.call(set_pose_req);
+
+            // pause after full rotation
+            ros::Rate rate(freq_);
+
+            geometry_msgs::Twist twist;
+            twist.linear.x = if_forward * frac_vel_ * max_trans_vel_;
+            twist.angular.z = 0;
+
+            int pub_times = abs(0.2 / (twist.linear.x * (1.0 / static_cast<double>(freq_))));
+
+            for (int k = 0; k < 10; k++)
+            {
+                for (int i = 0; i < pub_times; i++)
+                {
+                    twist.linear.x = if_forward * frac_vel_ * max_trans_vel_;
+                    twist.angular.z = 0;
+                    cmd_vel_pub_.publish(twist);
+                    ros::spinOnce();
+                    rate.sleep();
+                }
+                for (int j = 0; j < (pub_times / 10.0); j++)
+                {
+                    twist.linear.x = 0;
+                    twist.angular.z = 0;
+                    cmd_vel_pub_.publish(twist);
+                    ros::spinOnce();
+                    rate.sleep();
+                }
+                ros::spinOnce();
+            }
+
+            // stop the motor
+            twist.linear.x = 0;
+            twist.angular.z = 0;
+            cmd_vel_pub_.publish(twist);
+        }
 
         return true;
     }

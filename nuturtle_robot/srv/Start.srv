@@ -1,2 +1,6 @@
+bool if_rotation
+bool if_forward
 bool if_clockwise
+# forward translation: if_rotation=false, if_forward=true, if_clockwise=?
+# counter-clockwise rotation: if_rotation=true, if_forward=?, if_clockwise=false
 ---
