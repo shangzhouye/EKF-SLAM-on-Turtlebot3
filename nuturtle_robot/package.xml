@@ -55,6 +55,7 @@
   <build_export_depend>rospy</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
+  <build_depend>tf</build_depend>
 
   <build_depend>nuturtlebot</build_depend>
 

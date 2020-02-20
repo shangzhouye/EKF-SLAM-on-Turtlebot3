@@ -96,9 +96,12 @@ public:
     /// \returns if successful
     int pose_belief(double &x, double &y, double &theta);
 
-private:
+public:
+    // make them public for now for the use of real_waypoint node
     CurrentState state_;
     int current_waypoint_num_;
+
+private:
     std::vector<Vector2D> waypoints_;
     std::vector<Twist2D> cmd_sequence_;
     std::vector<double> pose_sequence_x_;

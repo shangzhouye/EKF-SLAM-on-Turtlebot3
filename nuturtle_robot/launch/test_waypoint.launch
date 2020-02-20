@@ -1,23 +1,26 @@
-<!-- The launch file is used for launching Turtle Odometry -->
-
 <launch>
-
-    <include file="$(find tsim)/launch/turtle_pent.launch" />
+    <rosparam command="load" file="$(find tsim)/config/turtle_way.yaml" />
 
     <param name="robot_description" command="xacro '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'" />
 
     <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="joint_states" to="joint_state"/>
+    </node>
+
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz" required="true"/>
 
     <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
         <param name="~body_frame_id_" type="str" value="base_link" />
         <param name="~odom_frame_id_" type="str" value="odom" />
-        <remap from="joint_state" to="joint_states"/>
     </node>
     
-    <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" />
+    <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" >
+        <remap from="joint_states" to="joint_state"/>
+    </node>
+
+    <node name="real_waypoint" pkg="nuturtle_robot" type="real_waypoint" output="screen"/>
 
 </launch>

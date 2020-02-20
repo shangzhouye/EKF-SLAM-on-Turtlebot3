@@ -1,5 +1,5 @@
 /// \file
-/// \brief Node for rotating the turtlebot in place
+/// \brief Node for rotating the turtlebot in place / translating the robot for testing
 ///
 /// PUBLISHES:
 ///     turtle1/cmd_vel (geometry_msgs/Twist): publish twist command on cmd_vel

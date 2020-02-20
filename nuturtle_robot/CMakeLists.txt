@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   nuturtlebot
   message_generation
   std_msgs
+  tf
 )
 
 if (CATKIN_ENABLE_TESTING)
@@ -63,6 +64,8 @@ endif()
  add_service_files(
    FILES
    Start.srv
+   StartWaypoint.srv
+   Stop.srv
 #   Service1.srv
 #   Service2.srv
  )
@@ -135,6 +138,10 @@ target_link_libraries(turtle_interface ${catkin_LIBRARIES} rigid2d_lib diff_driv
 add_executable(rotation src/rotation.cpp)
 add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rotation ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+
+add_executable(real_waypoint src/real_waypoint.cpp)
+add_dependencies(real_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(real_waypoint ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
 
 if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(turtle_interface_test test/turtle_interface_test.test test/turtle_interface_test.cpp)
@@ -214,8 +221,9 @@ endif()
 # )
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
 
-install(TARGETS turtle_interface rotation
+install(TARGETS turtle_interface rotation real_waypoint
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
