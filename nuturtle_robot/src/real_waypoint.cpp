@@ -117,6 +117,10 @@ public:
         for (int i = 0; i < waypoints_.size(); i++)
         {
             publish_waypoint_marker(waypoints_.at(i).x, waypoints_.at(i).y, i);
+            // wait marker publishing to finish
+            ros::spinOnce();
+            ros::Duration(0.2).sleep();
+            // ROS_INFO("Published Marker at %f, %f;", waypoints_.at(i).x, waypoints_.at(i).y);
         }
 
         while (ros::ok())
