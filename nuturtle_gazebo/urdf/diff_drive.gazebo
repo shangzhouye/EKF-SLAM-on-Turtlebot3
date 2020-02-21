@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<robot name="diff_drive" xmlns:xacro="https://www.ros.org/wiki/xacro" >
+
+    <gazebo reference="base_link_dummy">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <gazebo reference="base_link">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <gazebo reference="left_wheel">
+        <material>Gazebo/Red</material>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
+    </gazebo>
+
+    <gazebo reference="right_wheel">
+        <material>Gazebo/Red</material>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
+    </gazebo>
+
+    <gazebo reference="caster1">
+        <material>Gazebo/Green</material>
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+    </gazebo>
+
+    <gazebo reference="caster2">
+        <material>Gazebo/Green</material>
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+    </gazebo>
+
+</robot>

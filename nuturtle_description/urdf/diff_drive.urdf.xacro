@@ -14,6 +14,10 @@
 <!-- Define caster 'radius' - the length of the cylinder -->
 <xacro:property name="caster_radius" value="${radius - dimension['wheel_axle_offset']}" />
 
+<!-- include gazebo tags and plugins -->
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" />
+
+
 <!-- add a inertial-less base link for KDL -->
 <link name="base_link">
 </link>
