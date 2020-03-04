@@ -70,7 +70,7 @@
 <!-- caster 1 joint and link -->
 <joint name="base_link_dummy_caster1" type="fixed">
     <!-- Learned: it is displaced from the last joint frame -->
-    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${-(dimension['chassis_thickness']/2+caster_radius/2)}" rpy="0 0 0" />
+    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${-(dimension['chassis_thickness']/2)}" rpy="0 0 0" />
     <parent link="base_link_dummy" />
     <child link="caster1" />
 </joint>
@@ -81,7 +81,7 @@
 
 <!-- caster 2 joint and link -->
 <joint name="base_link_dummy_caster2" type="fixed">
-    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${dimension['chassis_thickness']/2+caster_radius/2}" rpy="0 0 0" />
+    <origin xyz="${dimension['chassis_length'] - radius - caster_radius} 0 ${dimension['chassis_thickness']/2}" rpy="0 0 0" />
     <parent link="base_link_dummy" />
     <child link="caster2" />
 </joint>

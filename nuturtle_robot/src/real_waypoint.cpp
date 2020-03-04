@@ -112,7 +112,7 @@ public:
                                  nuturtle_robot::StartWaypoint::Response &res)
     {
         ros::Rate rate(freq_);
-        
+
         // publish the markers
         for (int i = 0; i < waypoints_.size(); i++)
         {
@@ -127,8 +127,14 @@ public:
         {
             if (traj_generator.current_waypoint_num_ == waypoints_.size())
             {
+                geometry_msgs::Twist twist_cmd;
+                twist_cmd.linear.x = 0;
+                twist_cmd.angular.z = 0;
+                cmd_vel_pub_.publish(twist_cmd);
                 return true;
             }
+
+            // std::cout << "Current waypoint num: " << traj_generator.current_waypoint_num_ << std::endl;
 
             // get the next cmd_vel command
             rigid2d::Twist2D cmd = traj_generator.nextWaypoint();

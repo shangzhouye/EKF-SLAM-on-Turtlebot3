@@ -7,12 +7,11 @@
     <!-- Launch the Gazebo world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <!-- overwrite the world file -->
-        <!-- <arg name="world_name" value="$(find hw3b)/world/ddrive.world"/> -->
         <arg name="paused" value="true"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="gui" value="true"/>
         <arg name="recording" value="false"/>
-        <arg name="debug" value="false"/>
+        <arg name="debug" value="true"/>
     </include>
 
     <!-- spawn the robot -->
@@ -22,5 +21,22 @@
  
     <node name="diff_drive_robot" pkg="gazebo_ros" type="spawn_model" output="screen"
         args="-urdf -param robot_description -model diff_drive -x $(arg x) -y $(arg y) -z $(arg z)" />
+
+    <!-- follow waypoints -->
+    <rosparam command="load" file="$(find nuturtle_robot)/config/real_waypoints.yaml" />
+    <node pkg="nuturtle_robot" type="turtle_interface" name="turtle_interface" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="joint_states" to="joint_state"/>
+    </node>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_odom.rviz"/>
+
+    <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
+        <param name="~body_frame_id_" type="str" value="base_link" />
+        <param name="~odom_frame_id_" type="str" value="odom" />
+    </node>
+
+    <node name="real_waypoint" pkg="nuturtle_robot" type="real_waypoint" output="screen"/>
 
 </launch>

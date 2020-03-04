@@ -13,24 +13,54 @@
         <material>Gazebo/Red</material>
         <mu1>1.0</mu1>
         <mu2>1.0</mu2>
+        <minDepth>0.001</minDepth>
+        <fdir1>1 0 0 </fdir1>
+        <maxVel>0.1</maxVel>
+        <kp>500000</kp>
+        <kd>10</kd>
     </gazebo>
 
     <gazebo reference="right_wheel">
         <material>Gazebo/Red</material>
         <mu1>1.0</mu1>
         <mu2>1.0</mu2>
+        <minDepth>0.001</minDepth>
+        <fdir1>1 0 0 </fdir1>
+        <maxVel>0.1</maxVel>
+        <kp>500000</kp>
+        <kd>10</kd>
     </gazebo>
 
     <gazebo reference="caster1">
         <material>Gazebo/Green</material>
         <mu1>0.0</mu1>
         <mu2>0.0</mu2>
+        <minDepth>0.001</minDepth>
+        <maxVel>1.0</maxVel>
+        <kp>1000000</kp>
+        <kd>100</kd>
     </gazebo>
 
     <gazebo reference="caster2">
         <material>Gazebo/Green</material>
         <mu1>0.0</mu1>
         <mu2>0.0</mu2>
+        <minDepth>0.001</minDepth>
+        <maxVel>1.0</maxVel>
+        <kp>1000000</kp>
+        <kd>100</kd>
     </gazebo>
+
+    
+    <gazebo>
+        <plugin name="turtle_drive_plugin" filename="libnuturtle_gazebo_plugin.so">
+            <left_wheel_joint>left_wheel_axle</left_wheel_joint>
+            <right_wheel_joint>right_wheel_axle</right_wheel_joint>
+            <sensor_frequency>200</sensor_frequency>
+            <wheel_cmd_topic>/wheel_cmd</wheel_cmd_topic>
+            <sensor_data_topic>/sensor_data</sensor_data_topic>
+        </plugin>
+    </gazebo>
+    
 
 </robot>

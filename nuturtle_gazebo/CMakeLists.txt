@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5.4)
 project(nuturtle_gazebo)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -10,7 +10,10 @@ project(nuturtle_gazebo)
 find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   roscpp
+  nuturtlebot
 )
+
+find_package(gazebo REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -104,9 +107,12 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_gazebo
-#  CATKIN_DEPENDS gazebo_ros roscpp
+  CATKIN_DEPENDS gazebo_ros roscpp
 #  DEPENDS system_lib
 )
+
+# link_directories(${GAZEBO_LIBRARY_DIRS})
+# include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
 ###########
 ## Build ##
@@ -118,6 +124,12 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
+
+# make a library and link it with the gazebo libraries
+add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
+target_link_libraries(${PROJECT_NAME}_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+target_include_directories(${PROJECT_NAME}_plugin PUBLIC ${GAZEBO_INCLUDE_DIRS})
+add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -203,3 +215,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+# add compile settings
+add_compile_options(-Wall -Wextra)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
