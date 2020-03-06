@@ -29,7 +29,7 @@ public:
         scan_sub_ = nh.subscribe("scan", 1000, &LandmarkDetection::save_scan_callback, this);
         cluster_pub_ = nh.advertise<visualization_msgs::MarkerArray>("clusters", 100, true);
 
-        // create colors
+        // create eight colors for clusters
         colors.push_back(Eigen::Vector3d(0, 0, 0));
         colors.push_back(Eigen::Vector3d(1, 0, 0));
         colors.push_back(Eigen::Vector3d(0, 1, 0));
@@ -102,7 +102,6 @@ public:
         color_id_ = 0;
         for (auto const &cl : point_clusters_)
         {
-
             for (auto const &point : cl)
             {
                 visualization_msgs::Marker marker = publish_marker_clustered(point(0), point(1));
@@ -170,8 +169,9 @@ public:
         marker.color.b = colors.at(color_id_)(2);
 
         marker.color.a = 1.0;
-
-        marker.lifetime = ros::Duration(1);
+        
+        // 5 Hz publish rate
+        marker.lifetime = ros::Duration(1/5.0);
 
         return marker;
     }
