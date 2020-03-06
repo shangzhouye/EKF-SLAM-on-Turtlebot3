@@ -36,6 +36,11 @@
 </joint>
 
 <link name="base_scan">
+    <visual name="base_scan_visual">
+        <geometry>
+            <cylinder radius="0.01" length="0.01"/>
+        </geometry>
+    </visual>
 </link>
 
 <!-- base_link_dummy -->

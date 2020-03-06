@@ -110,7 +110,7 @@ public:
     }
 
     /// \brief read messages from joint states publisher (encoder), publish current pose and velocity, broadcast to tf
-    void joint_states_callback(const sensor_msgs::JointState msg)
+    void joint_states_callback(const sensor_msgs::JointState &msg)
     {
         if (!if_init_)
         {

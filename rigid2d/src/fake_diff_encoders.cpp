@@ -56,7 +56,7 @@ public:
     }
 
     /// \brief read the cmd_vel command, publish wheel velocity like an encoder
-    void cmd_vel_callback(const geometry_msgs::Twist msg)
+    void cmd_vel_callback(const geometry_msgs::Twist &msg)
     {
 
         sensor_msgs::JointState joint_state;

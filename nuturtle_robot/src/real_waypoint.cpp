@@ -92,7 +92,7 @@ public:
     }
 
     /// \brief save the pose from the odometer
-    void save_pose_callback(const nav_msgs::Odometry msg)
+    void save_pose_callback(const nav_msgs::Odometry &msg)
     {
         current_x_ = msg.pose.pose.position.x;
         current_y_ = msg.pose.pose.position.y;
