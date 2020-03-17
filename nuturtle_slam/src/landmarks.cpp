@@ -3,7 +3,7 @@
 ///
 /// PUBLISHES:
 ///     landmarks (nuslam/TurtleMap): publish the center and radius of the landmarks the node detects
-///     clustered points (visualization_msgs/Marker): publish markers of clustered points
+///     clusters (visualization_msgs/Marker): publish markers of clustered points
 /// SUBSCRIBERS:
 ///     scan (sensor_msgs/LaserScan): subscribe to the laser data
 
@@ -11,7 +11,6 @@
 #include "ros/ros.h"
 #include <string>
 #include <vector>
-#include <visualization_msgs/Marker.h>
 #include "sensor_msgs/LaserScan.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -20,6 +19,16 @@
 #include "rigid2d/rigid2d.hpp"
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <nuturtle_slam/TurtleMap.h>
+
+// circle data structure
+struct Circle
+{
+    double radius;
+    Eigen::Vector2d center;
+
+    Circle(double r, double x, double y) : radius(r), center(x, y) {}
+};
 
 class LandmarkDetection
 {
@@ -28,6 +37,7 @@ public:
     {
         scan_sub_ = nh.subscribe("scan", 1000, &LandmarkDetection::save_scan_callback, this);
         cluster_pub_ = nh.advertise<visualization_msgs::MarkerArray>("clusters", 100, true);
+        circles_pub_ = nh.advertise<nuturtle_slam::TurtleMap>("landmarks", 100, true);
 
         // create eight colors for clusters
         colors.push_back(Eigen::Vector3d(0, 0, 0));
@@ -40,10 +50,10 @@ public:
         colors.push_back(Eigen::Vector3d(1, 1, 1));
     }
 
-    /// \brief save the scan from the lidar
+    /// \brief save the scan from the lidar, cluste the points, call circle fitting algorithm
     void save_scan_callback(const sensor_msgs::LaserScan &msg)
     {
-        std::cout << "Callback called" << std::endl;
+        // std::cout << "Callback called" << std::endl;
         int i = 0;
         while (i < 360)
         {
@@ -75,17 +85,12 @@ public:
 
         // if last component in last vector
         // and first component in first vector are close to each other
-        // combine those two vectors
+        // insert the points in the last custer into the first cluster
+        // remove the last cluster
         if (distance(point_clusters_.front().front(), point_clusters_.back().back()) < threshold_)
         {
-            std::vector<Eigen::Vector2d> cluster;
-            cluster.reserve(point_clusters_.front().size() + point_clusters_.back().size());
-            cluster.insert(cluster.end(), point_clusters_.front().begin(), point_clusters_.front().end());
-            cluster.insert(cluster.end(), point_clusters_.back().begin(), point_clusters_.back().end());
-
+            point_clusters_.front().insert(point_clusters_.front().end(), point_clusters_.back().begin(), point_clusters_.back().end());
             point_clusters_.pop_back();
-            point_clusters_.erase(point_clusters_.begin()); // not ideal to remove a component at front in a vector
-            point_clusters_.push_back(cluster);
         }
 
         // remove the cluster if there are less than three points
@@ -96,7 +101,7 @@ public:
                                   }),
                               point_clusters_.end());
 
-        std::cout << "Numbers of clusters: " << point_clusters_.size() << std::endl;
+        // std::cout << "Numbers of clusters: " << point_clusters_.size() << std::endl;
 
         visualization_msgs::MarkerArray marker_array;
         color_id_ = 0;
@@ -107,7 +112,7 @@ public:
                 visualization_msgs::Marker marker = publish_marker_clustered(point(0), point(1));
                 marker_array.markers.push_back(marker);
             }
-            std::cout << "Size of cluster: " << cl.size() << std::endl;
+            // std::cout << "Size of cluster: " << cl.size() << std::endl;
             color_id_ += 1;
             if (color_id_ == 8)
             {
@@ -116,6 +121,24 @@ public:
         }
         cluster_pub_.publish(marker_array);
 
+        // put all the clusters into the circle fitting algorithm
+        nuturtle_slam::TurtleMap turtle_map;
+
+        for (auto clu : point_clusters_)
+        {
+            Circle circle_result = circle_fitting(clu);
+
+            // remove circles with too large or small radius
+            if (circle_result.radius >= radius_threshold_small_ &&
+                circle_result.radius <= radius_threshold_large_)
+            {
+                turtle_map.x.emplace_back(circle_result.center(0));
+                turtle_map.y.emplace_back(circle_result.center(1));
+                turtle_map.radius.emplace_back(circle_result.radius);
+            }
+        }
+
+        circles_pub_.publish(turtle_map);
         ros::spinOnce();
 
         point_clusters_.clear();
@@ -169,11 +192,171 @@ public:
         marker.color.b = colors.at(color_id_)(2);
 
         marker.color.a = 1.0;
-        
+
         // 5 Hz publish rate
-        marker.lifetime = ros::Duration(1/5.0);
+        marker.lifetime = ros::Duration(1 / 5.0);
 
         return marker;
+    }
+
+    /// \brief circular fitting algorithm
+    ///
+    ///     A. Al-Sharadqah and N. Chernov, Error Analysis for Circle Fitting Algorithms,
+    ///     Electronic Journal of Statistics (2009), Volume 3 p 886-911
+    /// \param points - the points to be fitted with a circle
+    /// \return the circle with radius and center point
+    Circle circle_fitting(std::vector<Eigen::Vector2d> points)
+    {
+        // compute the mean x and y
+        double x_mean = 0;
+        double y_mean = 0;
+        for (auto const &pt : points)
+        {
+            x_mean += pt(0);
+            y_mean += pt(1);
+        }
+        x_mean = x_mean / static_cast<double>(points.size());
+        y_mean = y_mean / static_cast<double>(points.size());
+
+        // std::cout << "Mean: " << x_mean << " and " << y_mean << std::endl;
+
+        // shift the centroid of data points
+        for (auto &pt : points)
+        {
+            pt(0) -= x_mean;
+            pt(1) -= y_mean;
+        }
+
+        // std::cout << "Shifted first point: " << points.at(0)(0) << " and " << points.at(0)(1) << std::endl;
+
+        // compute z and z_mean
+        std::vector<double> z;
+        for (auto &pt : points)
+        {
+            z.push_back(std::pow(pt(0), 2) + std::pow(pt(1), 2));
+        }
+
+        double z_mean = 0;
+        for (auto const &z_i : z)
+        {
+            z_mean += z_i;
+        }
+        z_mean = z_mean / static_cast<double>(z.size());
+        // std::cout << "First z: " << z.at(0) << std::endl;
+        // std::cout << "Z mean: " << z_mean << std::endl;
+
+        // form data matrix Z
+        Eigen::MatrixXd Z = Eigen::MatrixXd::Zero(points.size(), 4);
+
+        for (int i = 0; i < points.size(); i++)
+        {
+            Eigen::VectorXd vec(4);
+            vec << z.at(i), points.at(i)(0), points.at(i)(1), 1;
+            Z.row(i) = vec.transpose();
+        }
+
+        // std::cout << "Z Matrix: \n"
+        //           << Z << std::endl;
+
+        // form data matrix M
+
+        Eigen::MatrixXd M = (1 / static_cast<double>(points.size())) * Z.transpose() * Z;
+
+        // std::cout << "M Matrix: \n"
+        //           << M << std::endl;
+
+        // form H and H_inv
+        Eigen::Matrix4d H, H_inv;
+        H << 8 * z_mean, 0, 0, 2,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            2, 0, 0, 0;
+
+        H_inv << 0, 0, 0, (1.0 / 2.0),
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            (1.0 / 2.0), 0, 0, -2 * z_mean;
+
+        // std::cout << "H Matrix: \n"
+        //           << H << std::endl;
+
+        // std::cout << "H_inv Matrix: \n"
+        //           << H_inv << std::endl;
+
+        Eigen::JacobiSVD<Eigen::MatrixXd> svd(Z, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        Eigen::VectorXd sigular_values = svd.singularValues();
+        auto U = svd.matrixU();
+        auto V = svd.matrixV();
+
+        if (sigular_values(3) > 10e-12)
+        {
+
+            Eigen::Matrix<double, 4, 4> sigma = sigular_values.array().matrix().asDiagonal();
+
+            // std::cout << "sigma Matrix: \n"
+            //           << sigma << std::endl;
+
+            // std::cout << "V Matrix: \n"
+            //           << V << std::endl;
+
+            Eigen::MatrixXd Y = V * sigma * V.transpose();
+
+            // std::cout << "Y Matrix: \n"
+            //           << Y << std::endl;
+
+            // form Q matrix
+            Eigen::MatrixXd Q = Y * H_inv * Y;
+            // std::cout << "Q Matrix: \n"
+            //           << Q << std::endl;
+
+            // fine the eigenvector corresponding to the smallest positive eigenvalue
+            Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(Q);
+            Eigen::VectorXd ev = es.eigenvalues();
+
+            double smallest_ev = 99999;
+            double smallest_id = 0;
+            for (int i = 0; i < ev.size(); i++)
+            {
+                if (ev[i] > 0 && ev[i] < smallest_ev)
+                {
+                    smallest_ev = ev[i];
+                    smallest_id = i;
+                }
+            }
+            Eigen::MatrixXd A_star = es.eigenvectors().col(smallest_id);
+
+            // std::cout << "A_star Matrix: \n"
+            //           << A_star << std::endl;
+
+            // solve YA = A_star
+            Eigen::MatrixXd A = Y.colPivHouseholderQr().solve(A_star);
+
+            // std::cout << "A Matrix: \n"
+            //           << A << std::endl;
+
+            double a = (-A(1)) / (2 * A(0));
+            double b = (-A(2)) / (2 * A(0));
+            double R = std::sqrt((std::pow(A(1), 2) + std::pow(A(2), 2) - 4 * A(0) * A(3)) / (4 * std::pow(A(0), 2)));
+
+            // std::cout << "Radius " << R << "; a " << a << "; b " << b << std::endl;
+            // std::cout << "x " << a + x_mean << "; y " << b + y_mean << std::endl;
+
+            return Circle(R, a + x_mean, b + y_mean);
+        }
+
+        else
+        {
+            Eigen::MatrixXd A = V.col(3);
+
+            double a = (-A(1)) / (2 * A(0));
+            double b = (-A(2)) / (2 * A(0));
+            double R = std::sqrt((std::pow(A(1), 2) + std::pow(A(2), 2) - 4 * A(0) * A(3)) / (4 * std::pow(A(0), 2)));
+
+            // std::cout << "Radius " << R << "; a " << a << "; b " << b << std::endl;
+            // std::cout << "x " << a + x_mean << "; y " << b + y_mean << std::endl;
+
+            return Circle(R, a + x_mean, b + y_mean);
+        }
     }
 
 private:
@@ -184,9 +367,13 @@ private:
     int marker_id_ = 0;
 
     ros::Publisher cluster_pub_;
+    ros::Publisher circles_pub_;
 
     std::vector<Eigen::Vector3d> colors;
     int color_id_ = 0;
+
+    double radius_threshold_large_ = 0.13;
+    double radius_threshold_small_ = 0.01;
 };
 
 int main(int argc, char **argv)
@@ -195,6 +382,23 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "landmarks");
     ros::NodeHandle nh;
     LandmarkDetection my_landmark_detector = LandmarkDetection(nh);
+
+    // testing circular fitting algorithm
+    // std::vector<Eigen::Vector2d> test_points;
+    // test_points.push_back(Eigen::Vector2d(1, 7));
+    // test_points.push_back(Eigen::Vector2d(2, 6));
+    // test_points.push_back(Eigen::Vector2d(5, 8));
+    // test_points.push_back(Eigen::Vector2d(7, 7));
+    // test_points.push_back(Eigen::Vector2d(9, 5));
+    // test_points.push_back(Eigen::Vector2d(3, 7));
+    // my_landmark_detector.circle_fitting(test_points);
+
+    // std::vector<Eigen::Vector2d> test_points2;
+    // test_points2.push_back(Eigen::Vector2d(-1, 0));
+    // test_points2.push_back(Eigen::Vector2d(-0.3, -0.06));
+    // test_points2.push_back(Eigen::Vector2d(0.3, 0.1));
+    // test_points2.push_back(Eigen::Vector2d(1, 0));
+    // my_landmark_detector.circle_fitting(test_points2);
 
     ros::spin();
     return 0;

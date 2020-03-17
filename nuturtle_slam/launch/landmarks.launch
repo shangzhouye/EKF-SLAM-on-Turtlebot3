@@ -41,5 +41,6 @@
     </node> -->
 
     <node name="landmarks" pkg="nuturtle_slam" type="landmarks" output="screen"/>
+    <node name="draw_map" pkg="nuturtle_slam" type="draw_map" output="screen"/>
 
 </launch>

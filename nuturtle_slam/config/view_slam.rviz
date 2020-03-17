@@ -6,11 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1
-        - /TF1
         - /TF1/Frames1
-        - /LaserScan1
-        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 755
   - Class: rviz/Selection
@@ -185,6 +181,14 @@ Visualization Manager:
       Name: MarkerArray
       Namespaces:
         clusters: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /map_rviz
+      Name: MarkerArray
+      Namespaces:
+        map_rviz: true
       Queue Size: 100
       Value: true
   Enabled: true

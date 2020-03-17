@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>nuturtle_slam</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>The nuturtle_slam package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="shangzhouye@todo.todo">shangzhouye</maintainer>
+  <maintainer email="shangzhouye@gmail.com">shangzhouye</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>BSD</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
@@ -55,6 +55,18 @@
   <build_export_depend>sensor_msgs</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+
+  <build_depend>visualization_msgs</build_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <build_export_depend>visualization_msgs</build_export_depend>
+
 
 
   <!-- The export tag contains other, unspecified, tags -->

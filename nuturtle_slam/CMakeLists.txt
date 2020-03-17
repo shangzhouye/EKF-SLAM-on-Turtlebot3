@@ -16,6 +16,9 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
+  message_generation
+  std_msgs
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -52,11 +55,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  TurtleMap.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -73,10 +75,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -110,7 +112,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_slam
-#  CATKIN_DEPENDS roscpp sensor_msgs
+ CATKIN_DEPENDS roscpp sensor_msgs std_msgs visualization_msgs
 #  DEPENDS system_lib
 )
 
@@ -130,6 +132,10 @@ include_directories(
 add_executable(landmarks src/landmarks.cpp)
 add_dependencies(landmarks ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(landmarks ${catkin_LIBRARIES} rigid2d_lib)
+
+add_executable(draw_map src/draw_map.cpp)
+add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(draw_map ${catkin_LIBRARIES})
 
 
 ## Declare a C++ library
@@ -219,7 +225,7 @@ target_link_libraries(landmarks ${catkin_LIBRARIES} rigid2d_lib)
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
-install(TARGETS landmarks
+install(TARGETS landmarks draw_map
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
