@@ -55,7 +55,7 @@ public:
 
         marker.pose.position.x = x;
         marker.pose.position.y = y;
-        marker.pose.position.z = 0;
+        marker.pose.position.z = 0.1;
         marker.pose.orientation.x = 0.0;
         marker.pose.orientation.y = 0.0;
         marker.pose.orientation.z = 0.0;

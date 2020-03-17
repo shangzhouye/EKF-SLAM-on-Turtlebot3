@@ -19,7 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   visualization_msgs
+  gazebo_ros
 )
+
+find_package(gazebo REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -112,7 +115,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_slam
- CATKIN_DEPENDS roscpp sensor_msgs std_msgs visualization_msgs
+ CATKIN_DEPENDS roscpp sensor_msgs std_msgs visualization_msgs gazebo_ros
 #  DEPENDS system_lib
 )
 
@@ -128,6 +131,11 @@ include_directories(
   "/usr/include/eigen3"
   "../rigid2d/include/"
 )
+
+add_library(fake_data_association SHARED src/fake_data_association.cpp)
+target_link_libraries(fake_data_association ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+target_include_directories(fake_data_association PUBLIC ${GAZEBO_INCLUDE_DIRS})
+add_dependencies(fake_data_association ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(landmarks src/landmarks.cpp)
 add_dependencies(landmarks ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
