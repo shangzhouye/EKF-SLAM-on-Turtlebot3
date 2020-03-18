@@ -24,17 +24,25 @@ public:
     /// \brief receive landmark positions
     void sub_landmark(const nuturtle_slam::TurtleMap &msg)
     {
-        visualization_msgs::MarkerArray marker_array;
-        for (int i = 0; i < msg.x.size(); i++)
+        ros::Time current_time = ros::Time::now();
+        double time_gap = (current_time - last_time_).toSec();
+
+        // limit the publish rate at 5 Hz
+        if (time_gap >= (1.0 / frequency_))
         {
-            visualization_msgs::Marker marker_landmark = create_landmark_marker(msg.x.at(i),
-                                                                                msg.y.at(i),
-                                                                                msg.radius.at(i),
-                                                                                "base_link");
-            marker_array.markers.push_back(marker_landmark);
+            last_time_ = current_time;
+            visualization_msgs::MarkerArray marker_array;
+            for (int i = 0; i < msg.x.size(); i++)
+            {
+                visualization_msgs::Marker marker_landmark = create_landmark_marker(msg.x.at(i),
+                                                                                    msg.y.at(i),
+                                                                                    msg.radius.at(i),
+                                                                                    "base_link");
+                marker_array.markers.push_back(marker_landmark);
+            }
+            map_pub_.publish(marker_array);
+            ros::spinOnce();
         }
-        map_pub_.publish(marker_array);
-        ros::spinOnce();
     }
 
     /// \brief create markers for landmarks
@@ -81,6 +89,9 @@ private:
     ros::Publisher map_pub_;
     ros::Subscriber turtlemap_sub_;
     int marker_id_ = 0;
+
+    double frequency_ = 5.0;
+    ros::Time last_time_ = ros::Time::now();
 };
 
 int main(int argc, char **argv)
