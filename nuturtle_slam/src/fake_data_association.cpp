@@ -131,7 +131,7 @@ private:
                                                     11, 0.742731, -0.792074)
                                                        .finished();
     double distance_threshold = 1;
-    double sensor_frequency_ = 200.0;
+    double sensor_frequency_ = 5.0;
     ros::Time last_time_ = ros::Time::now();
 };
 

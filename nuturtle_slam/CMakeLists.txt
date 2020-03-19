@@ -20,6 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   visualization_msgs
   gazebo_ros
+  tf2_ros
+  rigid2d
 )
 
 find_package(gazebo REQUIRED)
@@ -144,6 +146,10 @@ target_link_libraries(landmarks ${catkin_LIBRARIES} rigid2d_lib)
 add_executable(draw_map src/draw_map.cpp)
 add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(draw_map ${catkin_LIBRARIES})
+
+add_executable(slam_in_control src/slam_in_control.cpp)
+add_dependencies(slam_in_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(slam_in_control ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
 
 
 ## Declare a C++ library
