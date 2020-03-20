@@ -19,6 +19,8 @@
 ///     joint_state (sensor_msgs/JointState): the joint states of l/r wheels
 ///     fake_landmarks (nuslam/TurtleMap): subscribe the fake landmarks with known data associations
 
+// tune initialized uncertainty for pose and measurements + R and Q
+
 #include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "ros/ros.h"
@@ -35,6 +37,16 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <unordered_map>
+
+struct Measurement
+{
+    int id_ = -1;
+    double range_ = 0;
+    double bearing_ = 0;
+
+    Measurement(int id, double range, double bearing) : id_(id), range_(range), bearing_(bearing) {}
+};
 
 class SLAMinControl
 {
@@ -64,7 +76,14 @@ private:
     Eigen::VectorXd mu_ = Eigen::VectorXd::Zero(3);
     Eigen::MatrixXd sigma_ = Eigen::MatrixXd::Zero(3, 3);
 
-    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.001, 0, 0, 0, 0.001, 0, 0, 0, 0.001).finished();
+    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01).finished();
+    const Eigen::Matrix<double, 2, 2> Qx_ = (Eigen::Matrix<double, 2, 2>() << 0.001, 0, 0, 0.001).finished();
+
+    std::vector<Measurement> measurements_;
+    bool if_measurements_ = false;
+
+    // store mapping between landmarkid and index in the state vector/matrix
+    std::unordered_map<int, int> landmark_id_to_index_;
 
 public:
     SLAMinControl(ros::NodeHandle &nh)
@@ -95,7 +114,6 @@ public:
     ///     Measurements come at around 5Hz while odometry updating at higher frequency
     void joint_states_callback(const sensor_msgs::JointState &msg)
     {
-        
 
         // initialize encoders
         if (!if_init_)
@@ -119,20 +137,117 @@ public:
         Eigen::VectorXd mu_hat = mu_;
         state_prediction_mu(mu_hat);
 
-        std::cout << "MU: " << mu_ << std::endl;
-        std::cout << "MU_HAT: " << mu_hat << std::endl;
+        // std::cout << "MU: " << mu_ << std::endl;
+        // std::cout << "MU_HAT: " << mu_hat << std::endl;
 
         state_prediction_sigma(twist);
 
+        // mu_ now is mu_hat
+        mu_ = mu_hat;
+
+        // ros::Time start = ros::Time::now();
+
+        // do correction steps if new measurement comes
+        if (if_measurements_)
+        {
+            for (const Measurement &mea : measurements_)
+            {
+                initialize_lanmark(mea);
+                Measurement expected = expected_measurement(mea);
+                Eigen::MatrixXd H = observation_jacobian(mea);
+
+                Eigen::Vector2d measurement_diff;
+                double bearing_diff = rigid2d::normalize_angle(mea.bearing_ - expected.bearing_);
+                measurement_diff << mea.range_ - expected.range_, bearing_diff;
+
+                Eigen::MatrixXd K = sigma_ * H.transpose() * (H * sigma_ * H.transpose() + Qx_).inverse();
+                mu_ = mu_ + K * measurement_diff;
+                sigma_ = (Eigen::MatrixXd::Identity(mu_.size(), mu_.size()) - K * H) * sigma_;
+            }
+            // std::cout << "End of Expect" << std::endl;
+            if_measurements_ = false;
+        }
+
+        // ros::Time end = ros::Time::now();
+        // std::cout << "Time for one loop: " << (end - start).toSec() << std::endl;
+
+        my_robot_.reset(rigid2d::Twist2D(mu_(2), mu_(0), mu_(1)));
+
         // publish robot pose tf using odom
-        publish_robot_tf(mu_hat(0), mu_hat(1), mu_hat(2));
+        publish_robot_tf(mu_(0), mu_(1), mu_(2));
 
         last_l_ = current_l_;
         last_r_ = current_r_;
-        mu_ = mu_hat;
 
-        std::cout << "MU: " << mu_ << std::endl;
-        std::cout << "SIGMA: " << sigma_ << std::endl;
+        // std::cout << "MU: " << mu_ << std::endl;
+        // std::cout << "SIGMA: " << sigma_ << std::endl;
+
+        ros::spinOnce();
+    }
+
+    /// \brief calculate the jacobian for the observation
+    Eigen::MatrixXd observation_jacobian(const Measurement &mea)
+    {
+        int index = landmark_id_to_index_.at(mea.id_);
+        double delta_x = mu_(index) - mu_(0);
+        double delta_y = mu_(index + 1) - mu_(1);
+        double q = std::pow(mu_(index) - mu_(0), 2) + std::pow(mu_(index + 1) - mu_(1), 2);
+
+        Eigen::Matrix<double, 2, 5> low_H;
+        low_H << -std::sqrt(q) * delta_x, -std::sqrt(q) * delta_y, 0, std::sqrt(q) * delta_x, std::sqrt(q),
+            delta_y, -delta_x, -q, -delta_y, delta_x;
+        low_H = low_H / q;
+
+        Eigen::MatrixXd F = Eigen::MatrixXd::Zero(5, mu_.size());
+        F.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
+        F(3, index) = 1;
+        F(4, index + 1) = 1;
+        // std::cout << "F Matrix is: " << F << std::endl;
+
+        Eigen::MatrixXd H = Eigen::MatrixXd::Zero(2, mu_.size());
+        H = low_H * F;
+
+        // std::cout << "Size of H is: " << H.rows() << " " << H.cols() << std::endl;
+
+        return H;
+    }
+
+    /// \brief calculate the expected measurement
+    Measurement expected_measurement(const Measurement &mea)
+    {
+        int index = landmark_id_to_index_.at(mea.id_);
+        double range = std::sqrt(std::pow(mu_(index) - mu_(0), 2) + std::pow(mu_(index + 1) - mu_(1), 2));
+        double bearing = rigid2d::normalize_angle(std::atan2(mu_(index + 1) - mu_(1), mu_(index) - mu_(0)) - mu_(2));
+        Measurement expected_mea(mea.id_, range, bearing);
+        // std::cout << "Expected Range at " << mea.id_ << " is " << range << std::endl;
+        // std::cout << "Expected Bearing at " << mea.id_ << " is " << bearing << std::endl;
+        return expected_mea;
+    }
+
+    /// \brief initialize the landmark it does not exist in the matrix
+    void initialize_lanmark(const Measurement &mea)
+    {
+        if (landmark_id_to_index_.find(mea.id_) == landmark_id_to_index_.end())
+        {
+            // add the landmark to the matrix
+
+            // add to the state vector
+            int index = mu_.size(); // added index would be index, index + 1
+            mu_.conservativeResize(index + 2);
+            mu_(index) = mu_(0) + mea.range_ * std::cos(mea.bearing_ + mu_(2));
+            mu_(index + 1) = mu_(1) + mea.range_ * std::sin(mea.bearing_ + mu_(2));
+
+            // add to the mapping
+            landmark_id_to_index_[mea.id_] = index;
+
+            // also initialize sigma matrix
+            sigma_.conservativeResize(Eigen::NoChange, index + 2);
+            sigma_.block(0, index, index, 2) = Eigen::MatrixXd::Zero(index, 2);
+            sigma_.conservativeResize(index + 2, Eigen::NoChange);
+            sigma_.block(index, 0, 2, index + 2) = Eigen::MatrixXd::Zero(2, index + 2);
+            sigma_(index, index) = 0.01;
+            sigma_(index + 1, index + 1) = 0.01;
+        }
     }
 
     /// \brief state prediction - update covariance
@@ -154,7 +269,7 @@ public:
                        (twist.v_x / twist.omega) * std::sin(mu_(2) + twist.omega);
         }
         Eigen::MatrixXd Rt = Eigen::MatrixXd::Zero(sigma_.rows(), sigma_.cols());
-        Rt.block(0,0,3,3) = Rx_;
+        Rt.block(0, 0, 3, 3) = Rx_;
         sigma_ = Gt * sigma_ * Gt.transpose() + Rt;
     }
 
@@ -208,7 +323,6 @@ public:
         transformStamped.transform.rotation.w = q_rot.w();
 
         br.sendTransform(transformStamped);
-        ros::spinOnce();
     }
 
     /// \brief publish nav_odo message
@@ -261,6 +375,20 @@ public:
     /// \brief save the measurements and trigger the correction
     void landmarks_callback(const nuturtle_slam::TurtleMap &msg)
     {
+        if (if_measurements_ == false)
+        {
+            measurements_.clear();
+            for (int i = 0; i < msg.id.size(); i++)
+            {
+                double range = std::sqrt(std::pow(msg.x.at(i), 2) + std::pow(msg.y.at(i), 2));
+                double bearing = std::atan2(msg.y.at(i), msg.x.at(i));
+                measurements_.emplace_back(msg.id.at(i), range, bearing);
+                // std::cout << "Measured Range at " << msg.id.at(i) << " is " << range << std::endl;
+                // std::cout << "Measured Bearing at " << msg.id.at(i) << " is " << bearing << std::endl;
+            }
+            if_measurements_ = true;
+            // std::cout << "End of measurement" << std::endl;
+        }
     }
 };
 
