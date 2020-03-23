@@ -14,7 +14,7 @@
 ///     current_r_: absolute position of the right wheel in current time step
 ///     last_time_now_: time stamp of last time step
 /// PUBLISHES:
-///     nav_odo (nav_msgs/Odometry): publish current robot pose
+///     nav_odo (nav_msgs/Odometry): publish current robot pose (from slam algorithm)
 ///     slam_landmarks (nuslam/TurtleMap): publish where the slam algorithm thinks the landmarks are
 ///     odom_path (nav_msgs/Path): trajectory estimated by odometry
 ///     slam_path (nav_msgs/Path): trajectory estimated by slam algorithm
@@ -82,7 +82,7 @@ private:
     Eigen::VectorXd mu_ = Eigen::VectorXd::Zero(3);
     Eigen::MatrixXd sigma_ = Eigen::MatrixXd::Zero(3, 3);
 
-    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1).finished();
+    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.001, 0, 0, 0, 0.001, 0, 0, 0, 0.001).finished();
     const Eigen::Matrix<double, 2, 2> Qx_ = (Eigen::Matrix<double, 2, 2>() << 0.01, 0, 0, 0.01).finished();
 
     std::vector<Measurement> measurements_;
@@ -224,6 +224,8 @@ public:
         T_m_o.displacement(map_odom_x, map_odom_y, map_odom_theta);
         publish_map_odom(map_odom_x, map_odom_y, map_odom_theta);
 
+        publish_nav_odo(mu_(0), mu_(1), mu_(2));
+
         // publish slam landmarks in map frame
         nuturtle_slam::TurtleMap slam_map;
         int landmark_numbers = (mu_.size() - 3) / 2;
@@ -309,8 +311,8 @@ public:
             sigma_.block(0, index, index, 2) = Eigen::MatrixXd::Zero(index, 2);
             sigma_.conservativeResize(index + 2, Eigen::NoChange);
             sigma_.block(index, 0, 2, index + 2) = Eigen::MatrixXd::Zero(2, index + 2);
-            sigma_(index, index) = 0.01;
-            sigma_(index + 1, index + 1) = 0.01;
+            sigma_(index, index) = 0.001;
+            sigma_(index + 1, index + 1) = 0.001;
         }
     }
 
@@ -415,51 +417,24 @@ public:
         br.sendTransform(transformStamped);
     }
 
-    /// \brief publish nav_odo message
-    void publish_nav_odo()
+    /// \brief publish nav_odo message (robot pose from slam algorithm)
+    void publish_nav_odo(double pose_x, double pose_y, double pose_theta)
     {
-        // nav_msgs::Odometry odo_msg;
-        // odo_msg.header.frame_id = odom_frame_id_;
-        // odo_msg.child_frame_id = body_frame_id_;
+        nav_msgs::Odometry odo_msg;
+        odo_msg.header.frame_id = odom_frame_id_;
+        odo_msg.child_frame_id = body_frame_id_;
 
-        // odo_msg.pose.pose.position.x = pose_x;
-        // odo_msg.pose.pose.position.y = pose_y;
+        odo_msg.pose.pose.position.x = pose_x;
+        odo_msg.pose.pose.position.y = pose_y;
 
-        // // convert orientation to quaternion
-        // tf2::Quaternion q_rot;
-        // double r = 0, p = 0, y = pose_theta;
-        // q_rot.setRPY(r, p, y);
-        // q_rot.normalize();
-        // tf2::convert(q_rot, odo_msg.pose.pose.orientation);
+        // convert orientation to quaternion
+        tf2::Quaternion q_rot;
+        double r = 0, p = 0, y = pose_theta;
+        q_rot.setRPY(r, p, y);
+        q_rot.normalize();
+        tf2::convert(q_rot, odo_msg.pose.pose.orientation);
 
-        // // std::cout << ros::Time::now() - last_time_now_;
-        // ros::Time current_time_now = ros::Time::now();
-        // double vel_diff_l = current_l_ - last_l_;
-        // double vel_diff_r = current_r_ - last_r_;
-
-        // vel_diff_l = rigid2d::normalize_angle(vel_diff_l);
-        // vel_diff_r = rigid2d::normalize_angle(vel_diff_r);
-
-        // double vel_l = (vel_diff_l) / (current_time_now - last_time_now_).toSec();
-        // double vel_r = (vel_diff_r) / (current_time_now - last_time_now_).toSec();
-
-        // std::cout << "Time difference: " << (current_time_now - last_time_now_).toSec() << std::endl;
-        // std::cout << "Wheel Velocities: " << vel_l << " and " << vel_r << std::endl;
-
-        // rigid2d::WheelVelocities wheel_vel;
-        // wheel_vel.v_left = vel_l;
-        // wheel_vel.v_right = vel_r;
-        // rigid2d::Twist2D twist = my_robot_.wheelsToTwist(wheel_vel);
-        // odo_msg.twist.twist.linear.x = twist.v_x;
-        // odo_msg.twist.twist.linear.y = twist.v_y;
-        // odo_msg.twist.twist.angular.z = twist.omega;
-
-        // last_time_now_ = current_time_now;
-
-        // last_l_ = current_l_;
-        // last_r_ = current_r_;
-
-        // nav_odo_pub_.publish(odo_msg);
+        nav_odo_pub_.publish(odo_msg);
     }
 
     /// \brief save the measurements and trigger the correction

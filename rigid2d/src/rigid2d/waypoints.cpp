@@ -102,7 +102,7 @@ int Waypoints::update_state()
 
 bool Waypoints::if_close(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y)
 {
-    return std::sqrt(std::pow(pos_1_x - pos_2_x, 2) + std::pow(pos_1_y - pos_2_y, 2)) < 0.3;
+    return std::sqrt(std::pow(pos_1_x - pos_2_x, 2) + std::pow(pos_1_y - pos_2_y, 2)) < 0.03;
 }
 
 CurrentState Waypoints::if_right_direct(double pos_1_x, double pos_1_y, double pos_2_x, double pos_2_y, double theta)

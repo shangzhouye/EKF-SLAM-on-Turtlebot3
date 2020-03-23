@@ -61,4 +61,8 @@
         <param name="~what_map" type="str" value="slam_map" />
     </node>
 
+    <!-- waypoints controller -->
+    <rosparam command="load" file="$(find nuturtle_slam)/config/waypoints.yaml" />
+    <node name="real_waypoint" pkg="nuturtle_robot" type="real_waypoint" output="screen"/>
+
 </launch>

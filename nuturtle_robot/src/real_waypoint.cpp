@@ -4,6 +4,8 @@
 /// PUBLISHES:
 ///     turtle1/cmd_vel (geometry_msgs/Twist): publish twist command on cmd_vel
 ///     visualization_marker (visualization_msgs/Marker): publish markers at waypoints
+/// SUBSCRIBERS:
+///     nav_odo (nav_msgs/Odometry): subscribe to current robot pose
 /// SERVICES:
 ///     stop (nuturtle_robot/Stop): stop the robot motion
 ///     start_waypoint (nuturtle_robot/StartWaypoint): start following the waypoint

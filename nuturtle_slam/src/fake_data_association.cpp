@@ -58,7 +58,7 @@ public:
 
         ros::NodeHandle nh;
 
-        d = std::normal_distribution<double>(0.0, 0.002);
+        d = std::normal_distribution<double>(0.0, 0.01);
 
         this->data_association_pub_ = nh.advertise<nuturtle_slam::TurtleMap>("fake_landmarks", 10);
         this->groundtruth_landmarks_pub_ = nh.advertise<nuturtle_slam::TurtleMap>("groundtruth_landmarks", 10);
