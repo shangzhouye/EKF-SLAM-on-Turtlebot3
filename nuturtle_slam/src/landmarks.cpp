@@ -20,6 +20,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <nuturtle_slam/TurtleMap.h>
+#include <algorithm>
 
 // circle data structure
 struct Circle
@@ -89,8 +90,10 @@ public:
         // remove the last cluster
         if (distance(point_clusters_.front().front(), point_clusters_.back().back()) < threshold_)
         {
-            point_clusters_.front().insert(point_clusters_.front().end(), point_clusters_.back().begin(), point_clusters_.back().end());
-            point_clusters_.pop_back();
+            // insert the first vector to the last one to ensure the point cluster is in sequence
+            // std::cout << "Same cluster" << std::endl;
+            point_clusters_.back().insert(point_clusters_.back().end(), point_clusters_.front().begin(), point_clusters_.front().end());
+            point_clusters_.erase(point_clusters_.begin());
         }
 
         // remove the cluster if there are less than three points
@@ -126,6 +129,13 @@ public:
 
         for (auto clu : point_clusters_)
         {
+            if (!circle_classification(clu))
+            {
+
+                // std::cout << " Not circle" << std::endl;
+                continue;
+            }
+
             Circle circle_result = circle_fitting(clu);
 
             // remove circles with too large or small radius
@@ -359,10 +369,61 @@ public:
         }
     }
 
+    /// \brief circle classification algorithm
+    ///
+    ///     J. Xavier et. al., Fast line, arc/circle and leg detection from laser
+    ///     scan data in a Player driver, ICRA 2005
+    bool circle_classification(const std::vector<Eigen::Vector2d> &points)
+    {
+        Eigen::Vector2d P1 = points.front();
+        Eigen::Vector2d P2 = points.back();
+        int size = points.size();
+        std::vector<double> angles;
+        double sum = 0;
+
+        for (int i = 1; i < size - 1; i++)
+        {
+            Eigen::Vector2d P = points.at(i);
+
+            // calculate the angle using cosine law
+            double c = distance(P1, P2);
+            double a = distance(P1, P);
+            double b = distance(P2, P);
+            double angle = std::acos((std::pow(a, 2) + std::pow(b, 2) - std::pow(c, 2)) / (2 * a * b));
+            angles.push_back(angle);
+            sum += angle;
+        }
+
+        double mean = sum / (size - 2);
+
+        double variance = 0;
+        double std = 0;
+
+        for (double &val : angles)
+        {
+            variance += pow(val - mean, 2);
+        }
+
+        variance = variance / 5;
+
+        std = sqrt(variance);
+
+        // std::cout << "Mean: " << mean << " STD: " << std << std::endl;
+
+        if (std < 0.5 && mean > 1.5708 && mean < 2.35619)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 private:
     ros::Subscriber scan_sub_;
     std::vector<std::vector<Eigen::Vector2d>> point_clusters_;
-    double threshold_ = 0.07;
+    double threshold_ = 0.09;
 
     int marker_id_ = 0;
 
@@ -372,7 +433,7 @@ private:
     std::vector<Eigen::Vector3d> colors;
     int color_id_ = 0;
 
-    double radius_threshold_large_ = 0.13;
+    double radius_threshold_large_ = 0.11;
     double radius_threshold_small_ = 0.01;
 };
 
