@@ -15,6 +15,7 @@
 ///     last_time_now_: time stamp of last time step
 /// PUBLISHES:
 ///     nav_odo (nav_msgs/Odometry): publish current robot pose
+///     slam_landmarks (nuslam/TurtleMap): publish where the slam algorithm thinks the landmarks are
 /// SUBSCRIBES:
 ///     joint_state (sensor_msgs/JointState): the joint states of l/r wheels
 ///     fake_landmarks (nuslam/TurtleMap): subscribe the fake landmarks with known data associations
@@ -62,6 +63,7 @@ private:
     double wheel_base_;
     double wheel_radius_;
     rigid2d::DiffDrive my_robot_;
+    rigid2d::DiffDrive odom_robot_;
 
     // define two wheel states: last and current
     double last_l_;
@@ -76,14 +78,16 @@ private:
     Eigen::VectorXd mu_ = Eigen::VectorXd::Zero(3);
     Eigen::MatrixXd sigma_ = Eigen::MatrixXd::Zero(3, 3);
 
-    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01).finished();
-    const Eigen::Matrix<double, 2, 2> Qx_ = (Eigen::Matrix<double, 2, 2>() << 0.001, 0, 0, 0.001).finished();
+    const Eigen::Matrix<double, 3, 3> Rx_ = (Eigen::Matrix<double, 3, 3>() << 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1).finished();
+    const Eigen::Matrix<double, 2, 2> Qx_ = (Eigen::Matrix<double, 2, 2>() << 0.01, 0, 0, 0.01).finished();
 
     std::vector<Measurement> measurements_;
     bool if_measurements_ = false;
 
     // store mapping between landmarkid and index in the state vector/matrix
     std::unordered_map<int, int> landmark_id_to_index_;
+
+    ros::Publisher slam_landmarks_pub_;
 
 public:
     SLAMinControl(ros::NodeHandle &nh)
@@ -101,12 +105,15 @@ public:
         nh.getParam("/right_wheel_joint", right_wheel_joint_);
 
         my_robot_ = rigid2d::DiffDrive(rigid2d::Transform2D(), wheel_base_, wheel_radius_);
+        odom_robot_ = rigid2d::DiffDrive(rigid2d::Transform2D(), wheel_base_, wheel_radius_);
 
         last_l_ = 0;
         last_r_ = 0;
         last_time_now_ = ros::Time::now();
 
         if_init_ = false;
+
+        slam_landmarks_pub_ = nh.advertise<nuturtle_slam::TurtleMap>("slam_landmarks", 10);
     }
 
     /// \brief read messages from joint states publisher (encoder) and do the prediction
@@ -134,6 +141,15 @@ public:
         encoder_to_twist(twist, dist_l, dist_r);
 
         my_robot_.updateOdometry(dist_l, dist_r);
+
+        // calculate odom pose
+        odom_robot_.updateOdometry(dist_l, dist_r);
+        rigid2d::Transform2D odom_current_pose = odom_robot_.get_pose();
+        double odom_pose_x, odom_pose_y, odom_pose_theta;
+        odom_current_pose.displacement(odom_pose_x, odom_pose_y, odom_pose_theta);
+        // publish odom to base link
+        publish_robot_tf(odom_pose_x, odom_pose_y, odom_pose_theta);
+
         Eigen::VectorXd mu_hat = mu_;
         state_prediction_mu(mu_hat);
 
@@ -173,8 +189,31 @@ public:
 
         my_robot_.reset(rigid2d::Twist2D(mu_(2), mu_(0), mu_(1)));
 
-        // publish robot pose tf using odom
-        publish_robot_tf(mu_(0), mu_(1), mu_(2));
+        // publish tf from map to odom
+        // map to base_link is mu_(0), mu_(1), mu_(2)
+        // odom to base_link is odom_pose_x, odom_pose_y, odom_pose_theta
+        rigid2d::Transform2D T_m_b = rigid2d::Transform2D(rigid2d::Vector2D(mu_(0), mu_(1)), mu_(2));
+        rigid2d::Transform2D T_o_b = rigid2d::Transform2D(rigid2d::Vector2D(odom_pose_x, odom_pose_y), odom_pose_theta);
+        rigid2d::Transform2D T_m_o = T_m_b * (T_o_b.inv());
+        double map_odom_x, map_odom_y, map_odom_theta;
+        T_m_o.displacement(map_odom_x, map_odom_y, map_odom_theta);
+        publish_map_odom(map_odom_x, map_odom_y, map_odom_theta);
+
+        // publish slam landmarks in map frame
+        nuturtle_slam::TurtleMap slam_map;
+        int landmark_numbers = (mu_.size() - 3) / 2;
+
+        for (int i = 0; i < landmark_numbers; i++)
+        {
+            double landmark_x = mu_(3 + i*2);
+            double landmark_y = mu_(4 + i*2);
+
+            slam_map.x.emplace_back(landmark_x);
+            slam_map.y.emplace_back(landmark_y);
+            slam_map.radius.emplace_back(0.05);
+        }
+
+        slam_landmarks_pub_.publish(slam_map);
 
         last_l_ = current_l_;
         last_r_ = current_r_;
@@ -313,6 +352,32 @@ public:
         transformStamped.header.stamp = ros::Time::now();
         transformStamped.header.frame_id = odom_frame_id_;
         transformStamped.child_frame_id = body_frame_id_;
+        transformStamped.transform.translation.x = pose_x;
+        transformStamped.transform.translation.y = pose_y;
+        transformStamped.transform.translation.z = 0.0;
+
+        transformStamped.transform.rotation.x = q_rot.x();
+        transformStamped.transform.rotation.y = q_rot.y();
+        transformStamped.transform.rotation.z = q_rot.z();
+        transformStamped.transform.rotation.w = q_rot.w();
+
+        br.sendTransform(transformStamped);
+    }
+
+    /// \brief publish map to odom
+    void publish_map_odom(double pose_x, double pose_y, double pose_theta)
+    {
+        // convert orientation to quaternion
+        tf2::Quaternion q_rot;
+        double r = 0, p = 0, y = pose_theta;
+        q_rot.setRPY(r, p, y);
+        q_rot.normalize();
+        // broadcast the tf
+        static tf2_ros::TransformBroadcaster br;
+        geometry_msgs::TransformStamped transformStamped;
+        transformStamped.header.stamp = ros::Time::now();
+        transformStamped.header.frame_id = "map";
+        transformStamped.child_frame_id = "odom";
         transformStamped.transform.translation.x = pose_x;
         transformStamped.transform.translation.y = pose_y;
         transformStamped.transform.translation.z = 0.0;

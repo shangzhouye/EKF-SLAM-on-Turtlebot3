@@ -19,6 +19,20 @@ public:
     {
         map_pub_ = nh.advertise<visualization_msgs::MarkerArray>("map_rviz", 100, true);
         turtlemap_sub_ = nh.subscribe("landmarks", 1000, &DrawMap::sub_landmark, this);
+        ros::param::get("~what_map", what_map_);
+
+        if (what_map_ == "measurements")
+        {
+            publish_frame_ = "base_link";
+        }
+        else if (what_map_ == "groundtruth_map")
+        {
+            publish_frame_ = "map";
+        }
+        else
+        {
+            publish_frame_ = "map";
+        }
     }
 
     /// \brief receive landmark positions
@@ -30,7 +44,7 @@ public:
             visualization_msgs::Marker marker_landmark = create_landmark_marker(msg.x.at(i),
                                                                                 msg.y.at(i),
                                                                                 msg.radius.at(i),
-                                                                                "base_link");
+                                                                                publish_frame_);
             marker_array.markers.push_back(marker_landmark);
         }
         map_pub_.publish(marker_array);
@@ -63,11 +77,37 @@ public:
 
         marker.scale.x = radius;
         marker.scale.y = radius;
-        marker.scale.z = 0.2;
+
+        if (what_map_ == "measurements")
+        {
+            marker.scale.z = 0.2;
+        }
+        else if (what_map_ == "groundtruth_map")
+        {
+            marker.scale.z = 0.4;
+        }
+        else
+        {
+            marker.scale.z = 0.3;
+        }
 
         marker.color.r = 0.0;
-        marker.color.g = 1.0;
-        marker.color.b = 0.0;
+
+        if (what_map_ == "measurements")
+        {
+            marker.color.g = 1.0;
+            marker.color.b = 0.0;
+        }
+        else if (what_map_ == "groundtruth_map")
+        {
+            marker.color.g = 0.0;
+            marker.color.b = 1.0;
+        }
+        else
+        {
+            marker.color.g = 1.0;
+            marker.color.b = 1.0;
+        }
 
         marker.color.a = 1.0;
 
@@ -81,6 +121,8 @@ private:
     ros::Publisher map_pub_;
     ros::Subscriber turtlemap_sub_;
     int marker_id_ = 0;
+    std::string publish_frame_;
+    std::string what_map_;
 };
 
 int main(int argc, char **argv)

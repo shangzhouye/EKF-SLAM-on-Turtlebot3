@@ -120,6 +120,8 @@ Visualization Manager:
           Value: false
         left_wheel:
           Value: true
+        map:
+          Value: true
         odom:
           Value: true
         right_wheel:
@@ -130,19 +132,20 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        odom:
-          base_link:
-            base_link_dummy:
-              caster1:
+        map:
+          odom:
+            base_link:
+              base_link_dummy:
+                caster1:
+                  {}
+                caster2:
+                  {}
+                left_wheel:
+                  {}
+                right_wheel:
+                  {}
+              base_scan:
                 {}
-              caster2:
-                {}
-              left_wheel:
-                {}
-              right_wheel:
-                {}
-            base_scan:
-              {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -180,22 +183,61 @@ Visualization Manager:
       Marker Topic: /clusters
       Name: MarkerArray
       Namespaces:
-        clusters: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /map_rviz
+      Marker Topic: /measurements
       Name: MarkerArray
       Namespaces:
         map_rviz: true
       Queue Size: 100
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /groundtruth_map
+      Name: MarkerArray
+      Namespaces:
+        map_rviz: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /slam_map
+      Name: MarkerArray
+      Namespaces:
+        map_rviz: true
+      Queue Size: 100
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 25; 255; 0
+      Enabled: true
+      Head Diameter: 0.029999999329447746
+      Head Length: 0.019999999552965164
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 25; 255; 0
+      Pose Style: Arrows
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.009999999776482582
+      Shaft Length: 0.009999999776482582
+      Topic: /groundtruth_path
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -234,10 +276,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4203970432281494
+      Pitch: 0.8203977942466736
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.723574638366699
+      Yaw: 4.628573417663574
     Saved: ~
 Window Geometry:
   Displays:

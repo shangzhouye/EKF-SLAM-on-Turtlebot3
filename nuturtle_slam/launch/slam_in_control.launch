@@ -43,8 +43,22 @@
     <!-- <node name="landmarks" pkg="nuturtle_slam" type="landmarks" output="screen"/> -->
 
     <!-- Use the fake data with known data association -->
-    <node name="draw_map" pkg="nuturtle_slam" type="draw_map" output="screen">
+    <node name="measurements" pkg="nuturtle_slam" type="draw_map" output="screen">
         <remap from="landmarks" to="fake_landmarks"/>
+         <remap from="map_rviz" to="measurements"/>
+        <param name="~what_map" type="str" value="measurements" />
+    </node>
+
+    <node name="groundtruth_map" pkg="nuturtle_slam" type="draw_map" output="screen">
+        <remap from="landmarks" to="groundtruth_landmarks"/>
+        <remap from="map_rviz" to="groundtruth_map"/>
+        <param name="~what_map" type="str" value="groundtruth_map" />
+    </node>
+
+    <node name="slam_map" pkg="nuturtle_slam" type="draw_map" output="screen">
+        <remap from="landmarks" to="slam_landmarks"/>
+        <remap from="map_rviz" to="slam_map"/>
+        <param name="~what_map" type="str" value="slam_map" />
     </node>
 
 </launch>
