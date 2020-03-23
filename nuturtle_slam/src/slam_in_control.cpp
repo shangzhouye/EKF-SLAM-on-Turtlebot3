@@ -16,6 +16,8 @@
 /// PUBLISHES:
 ///     nav_odo (nav_msgs/Odometry): publish current robot pose
 ///     slam_landmarks (nuslam/TurtleMap): publish where the slam algorithm thinks the landmarks are
+///     odom_path (nav_msgs/Path): trajectory estimated by odometry
+///     slam_path (nav_msgs/Path): trajectory estimated by slam algorithm
 /// SUBSCRIBES:
 ///     joint_state (sensor_msgs/JointState): the joint states of l/r wheels
 ///     fake_landmarks (nuslam/TurtleMap): subscribe the fake landmarks with known data associations
@@ -39,6 +41,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <unordered_map>
+#include "nav_msgs/Path.h"
+#include "geometry_msgs/PoseStamped.h"
 
 struct Measurement
 {
@@ -88,6 +92,11 @@ private:
     std::unordered_map<int, int> landmark_id_to_index_;
 
     ros::Publisher slam_landmarks_pub_;
+    ros::Publisher odom_path_pub_;
+    ros::Publisher slam_path_pub_;
+
+    nav_msgs::Path odom_path_;
+    nav_msgs::Path slam_path_;
 
 public:
     SLAMinControl(ros::NodeHandle &nh)
@@ -114,6 +123,11 @@ public:
         if_init_ = false;
 
         slam_landmarks_pub_ = nh.advertise<nuturtle_slam::TurtleMap>("slam_landmarks", 10);
+        odom_path_pub_ = nh.advertise<nav_msgs::Path>("odom_path", 10);
+        slam_path_pub_ = nh.advertise<nav_msgs::Path>("slam_path", 10);
+
+        odom_path_.header.frame_id = "map";
+        slam_path_.header.frame_id = "map";
     }
 
     /// \brief read messages from joint states publisher (encoder) and do the prediction
@@ -181,6 +195,17 @@ public:
                 sigma_ = (Eigen::MatrixXd::Identity(mu_.size(), mu_.size()) - K * H) * sigma_;
             }
             // std::cout << "End of Expect" << std::endl;
+
+            geometry_msgs::PoseStamped odom_pose_to_pub = create_pose(odom_pose_x, odom_pose_y, odom_pose_theta);
+            odom_path_.poses.push_back(odom_pose_to_pub);
+            odom_path_.header.stamp = ros::Time::now();
+            odom_path_pub_.publish(odom_path_);
+
+            geometry_msgs::PoseStamped slam_pose_to_pub = create_pose(mu_(0), mu_(1), mu_(2));
+            slam_path_.poses.push_back(slam_pose_to_pub);
+            slam_path_.header.stamp = ros::Time::now();
+            slam_path_pub_.publish(slam_path_);
+
             if_measurements_ = false;
         }
 
@@ -205,8 +230,8 @@ public:
 
         for (int i = 0; i < landmark_numbers; i++)
         {
-            double landmark_x = mu_(3 + i*2);
-            double landmark_y = mu_(4 + i*2);
+            double landmark_x = mu_(3 + i * 2);
+            double landmark_y = mu_(4 + i * 2);
 
             slam_map.x.emplace_back(landmark_x);
             slam_map.y.emplace_back(landmark_y);
@@ -454,6 +479,31 @@ public:
             if_measurements_ = true;
             // std::cout << "End of measurement" << std::endl;
         }
+    }
+
+    /// \brief create a pose to publish
+    geometry_msgs::PoseStamped create_pose(double pose_x, double pose_y, double pose_theta)
+    {
+        geometry_msgs::PoseStamped pose_to_pub;
+        pose_to_pub.header.stamp = ros::Time::now();
+        pose_to_pub.header.frame_id = "map";
+
+        // convert orientation to quaternion
+        tf2::Quaternion q_rot;
+        double r = 0, p = 0, y = pose_theta;
+        q_rot.setRPY(r, p, y);
+        q_rot.normalize();
+
+        pose_to_pub.pose.position.x = pose_x;
+        pose_to_pub.pose.position.y = pose_y;
+        pose_to_pub.pose.position.z = 0.0;
+
+        pose_to_pub.pose.orientation.x = q_rot.x();
+        pose_to_pub.pose.orientation.y = q_rot.y();
+        pose_to_pub.pose.orientation.z = q_rot.z();
+        pose_to_pub.pose.orientation.w = q_rot.w();
+
+        return pose_to_pub;
     }
 };
 

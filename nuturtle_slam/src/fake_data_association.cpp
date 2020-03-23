@@ -5,7 +5,7 @@
 /// PUBLISHES:
 ///     fake_landmarks (nuslam/TurtleMap): publish the fake landmarks with known data associations
 ///     groundtruth_landmarks (nuslam/TurtleMap): publish groundtruth landmarks in map frame
-///     groundtruth_path (nav_msgs::Path): publish groundtruth trajectory of robot
+///     groundtruth_path (nav_msgs/Path): publish groundtruth trajectory of robot
 /// PARAMETERS:
 ///     Noise level: noise of the landmarks positions
 ///     Radius of detection: landmarks inside the radius can be detected.
@@ -85,7 +85,7 @@ public:
             // std::cout << "Known map" << known_map << std::endl;
 
             // publish the groundtruth trajectory
-            geometry_msgs::PoseStamped pose_to_pub = publish_map_odom(x, y, theta);
+            geometry_msgs::PoseStamped pose_to_pub = create_pose(x, y, theta);
             path_.poses.push_back(pose_to_pub);
             path_.header.stamp = ros::Time::now();
             ground_truth_path_pub_.publish(path_);
@@ -155,7 +155,7 @@ public:
     }
 
     /// \brief create a pose to publish
-    geometry_msgs::PoseStamped publish_map_odom(double pose_x, double pose_y, double pose_theta)
+    geometry_msgs::PoseStamped create_pose(double pose_x, double pose_y, double pose_theta)
     {
         geometry_msgs::PoseStamped pose_to_pub;
         pose_to_pub.header.stamp = ros::Time::now();

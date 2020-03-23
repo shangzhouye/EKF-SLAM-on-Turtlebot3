@@ -29,7 +29,7 @@
         <remap from="joint_states" to="joint_state"/>
     </node>
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_slam)/config/view_slam.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_slam)/config/view_landmark_detection.rviz"/>
 
     <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
         <param name="~body_frame_id_" type="str" value="base_link" />
@@ -41,6 +41,8 @@
     </node> -->
 
     <node name="landmarks" pkg="nuturtle_slam" type="landmarks" output="screen"/>
-    <node name="draw_map" pkg="nuturtle_slam" type="draw_map" output="screen"/>
+    <node name="draw_map" pkg="nuturtle_slam" type="draw_map" output="screen">
+        <param name="~what_map" type="str" value="measurements" />
+    </node>
 
 </launch>
