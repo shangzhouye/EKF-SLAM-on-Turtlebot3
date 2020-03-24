@@ -151,6 +151,10 @@ add_executable(slam_in_control src/slam_in_control.cpp)
 add_dependencies(slam_in_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(slam_in_control ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
 
+add_executable(slam src/slam.cpp)
+add_dependencies(slam ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(slam ${catkin_LIBRARIES} rigid2d_lib diff_drive_lib waypoints_lib)
+
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -239,7 +243,7 @@ target_link_libraries(slam_in_control ${catkin_LIBRARIES} rigid2d_lib diff_drive
 
 install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
-install(TARGETS landmarks draw_map
+install(TARGETS landmarks draw_map slam_in_control slam
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
