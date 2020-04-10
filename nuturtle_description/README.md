@@ -1,6 +1,3 @@
-# ME495 Sensing, Navigation, and Machine Learning
-Author: Shangzhou Ye
-
 ## Overview
 
 This package includes the description of a differential driving two-wheel robot for simulation.

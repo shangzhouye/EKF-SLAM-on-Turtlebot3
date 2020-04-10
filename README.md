@@ -1,63 +1,81 @@
-# ME495 Sensing, Navigation, and Machine Learning
-Author: Shangzhou Ye
+# Feature-based EKF SLAM on Turtlebot3 from Scratch
 
-# Tasks Submitted
+## Overview
 
-- A.001
-- G.001
-- G.002
-- G.003
-- G.004
-- G.005
-- S.000
-- S.001
-- L.001
-- L.002
-- L.003
+This repository builds feature-based EKF SLAM on Turtlebot3 from scratch. The demo below shows the algorithm in action (2x speed).
 
-# Tasks Completed
+Figure
 
-- 0.000
-- 0.001
-- 0.002
-- A.000
-- A.001
-- A.002
-- A.003
-- A.004
-- B.000
-- B.001
-- B.002
-- B.003
-- B.004
-- C.000
-- C.001
-- C.002
-- C.003
-- C.004
-- C.005
-- C.006
-- C.007
-- C.008
-- C.009
-- C.010
-- E.000
-- E.001
-- E.002
-- E.003
-- E.004
-- E.005
-- B.005
-- B.006
-- A.005
-- E.006
-- F.000
-- F.001
-- F.002
-- F.003
-- F.004
-- F.005
-- F.006
-- F.007
-- F.008
-- F.009
+- Trajectories
+  - THe pink path shows the odometer estimated path.
+  - The green path is the groundtruth.
+  - Yello path is SLAM results.
+- Landmarks
+  - Blue landmarks are groundtruth.
+  - Green landmarks are measurements.
+  - Indigo landmarks show where the SLAM algorithm thinks their positions are.
+
+The figure below shows the result of the landmark detection algorithm using a 2D LIDAR scanner:
+
+Figure
+
+The system has the following major components:
+
+- A **2D Lie Group** library for differential drive robots with complete unit testing
+- A waypoint following **feedback controller**
+- **Turtlebot3 URDF** built from scratch for Gazebo simulation
+- **Gazebo plugins** to control the robot and return the groundtruth data for evaluation
+- An **odometer** that estimates robot states based on encoder reading
+- **Turtlebot3 interface** that controls the motors with given velocity command
+- **Feature detection** algorithm that identifies landmarks using a 2D LIDAR scanner
+- **EKF SLAM** algorithm that estimates robots states
+
+A detailed description can be found in my portfolio.
+
+link
+
+## File structure
+
+### Packages
+
+Six packages are in this repository.
+
+- `nuturtle_description` develops Turtlebot3 URDF, and visualizes the wheeled robot in `Rviz`
+- `nuturtle_gazebo` simulates the robot in `Gazebo`
+- `nuturtle_robot` implements the Turtlebot3 interface, and includes the test node for the odometer on the real robot
+- `nuturtle_slam` includes the feature detection algorithm and the EKF SLAM algorithm
+- `tsim` implements the waypoints following feedback controller
+- `rigid2d` is the 2D Lie Group library, including SO(2), SE(2) calculations, the odometer, and the fake encoder
+
+### Major launch files
+
+- `nuturtle_description/launch/view_diff_drive.launch` launches the URDF model in `Rviz`
+- `nuturtle_robot/launch/test_waypoint.launch` drives the robot through waypoints using the fake encoder with visualization in `Rviz`
+  - Service `/start_waypoint` would start the movement
+- `nuturtle_gazebo/launch/diff_drive_gazebo.launch` drives the robot through waypoints in `Gazebo` simulation
+- `nuturtle_slam/launch/landmarks.launch` launches the landmark detection algorithm with visualization in `Rviz`
+- `nuturtle_slam/launch/slam_in_control.launch` launches the actual SLAM algorithm
+    - `Rviz` visualization is in `map` frame
+    - Pink path shows the odometer estimated path.
+    - Green path is the groundtruth.
+    - Yello path is SLAM results.
+    - Blue landmarks are groundtruth.
+    - Green landmarks are measurements.
+    - Indigo landmarks show where the SLAM algorithm thinks their positions are.
+
+## Dependencies
+
+- **ROS Melodic** ([Link](http://wiki.ros.org/melodic/Installation/Ubuntu))
+- **Eigen** ([Official Site](http://eigen.tuxfamily.org/))
+
+## Quick Start guide
+
+- Install all the dependencies
+- `fork` this repository, then clone the package using `wstool`
+  - `rosinstall` file is included in the repository
+- Build the package using `catkin_make`
+- Use `roslaunch nuturtle_slam slam_in_control` to launch the SLAM algorithm
+
+## Future work
+
+- Data association is currently assumed to be known. SLAM with unknown data association can be achieved by calculating the Mahalanobis Distance
