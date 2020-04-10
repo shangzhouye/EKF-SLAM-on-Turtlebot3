@@ -17,4 +17,4 @@ This package make the turtle in turtle simulation move in a rectangular trajecto
 
 The following figures illustrates the state machine coded in `src/turtle_rect.cpp`.
 
-![state_machine](https://github.com/ME495-Navigation/main-assignment-shangzhouye/blob/master/figures/tsim_state_machine.png?raw=true "state_machine")
+![state_machine](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/tsim_state_machine.png?raw=true "state_machine")

@@ -4,7 +4,7 @@
 
 This repository builds feature-based EKF SLAM on Turtlebot3 from scratch. The demo below shows the algorithm in action (2x speed).
 
-Figure
+![](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/slam_in_control.gif?raw=true)
 
 - Trajectories
   - THe pink path shows the odometer estimated path.
@@ -17,7 +17,7 @@ Figure
 
 The figure below shows the result of the landmark detection algorithm using a 2D LIDAR scanner:
 
-Figure
+![](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/landmark_detection.gif?raw=true)
 
 The system has the following major components:
 
