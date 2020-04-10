@@ -7,7 +7,7 @@ This repository builds feature-based EKF SLAM on Turtlebot3 from scratch. The de
 ![](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/slam_in_control.gif?raw=true)
 
 - Trajectories
-  - THe pink path shows the odometer estimated path.
+  - The pink path shows the odometer estimated path.
   - The green path is the groundtruth.
   - Yello path is SLAM results.
 - Landmarks
@@ -15,7 +15,7 @@ This repository builds feature-based EKF SLAM on Turtlebot3 from scratch. The de
   - Green landmarks are measurements.
   - Indigo landmarks show where the SLAM algorithm thinks their positions are.
 
-The figure below shows the result of the landmark detection algorithm using a 2D LIDAR scanner:
+The figure below shows the result of the landmark detection algorithm using a 2D laser scanner:
 
 ![](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/landmark_detection.gif?raw=true)
 
@@ -27,12 +27,10 @@ The system has the following major components:
 - **Gazebo plugins** to control the robot and return the groundtruth data for evaluation
 - An **odometer** that estimates robot states based on encoder reading
 - **Turtlebot3 interface** that controls the motors with given velocity command
-- **Feature detection** algorithm that identifies landmarks using a 2D LIDAR scanner
+- **Feature detection** algorithm that identifies landmarks using a 2D laser scanner
 - **EKF SLAM** algorithm that estimates robots states
 
-A detailed description can be found in my portfolio.
-
-link
+A detailed [description](https://shangzhouye.tech/project/ekf_slam/) can be found in my portfolio.
 
 ## File structure
 
@@ -41,7 +39,7 @@ link
 Six packages are in this repository.
 
 - `nuturtle_description` develops Turtlebot3 URDF, and visualizes the wheeled robot in `Rviz`
-- `nuturtle_gazebo` simulates the robot in `Gazebo`
+- `nuturtle_gazebo` includes Gazebo plugins to simulate the robot in `Gazebo`
 - `nuturtle_robot` implements the Turtlebot3 interface, and includes the test node for the odometer on the real robot
 - `nuturtle_slam` includes the feature detection algorithm and the EKF SLAM algorithm
 - `tsim` implements the waypoints following feedback controller
