@@ -30,7 +30,7 @@ The system has the following major components:
 - **Feature detection** algorithm that identifies landmarks using a 2D laser scanner
 - **EKF SLAM** algorithm that estimates robots states
 
-A detailed [description](https://shangzhouye.tech/project/ekf_slam/) can be found in my portfolio.
+A detailed [description](https://shangzhouye.tech/featured-projects/ekf_slam/) can be found in my portfolio.
 
 ## File structure
 
