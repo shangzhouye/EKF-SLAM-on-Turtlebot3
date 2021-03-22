@@ -4,7 +4,7 @@
 
 This repository builds feature-based EKF SLAM on Turtlebot3 from scratch. The demo below shows the algorithm in action (2x speed).
 
-![](https://github.com/shangzhouye/EKF-SLAM-on-Turtlebot3/blob/public/figures/slam_in_control.gif?raw=true)
+![](https://github.com/shangzhouye/portfolio-website/blob/master/content/featured-projects/ekf_slam/side_by_side.gif?raw=true)
 
 - Trajectories
   - The pink path shows the odometer estimated path.
